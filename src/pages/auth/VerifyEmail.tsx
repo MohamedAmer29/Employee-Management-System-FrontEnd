@@ -1,17 +1,19 @@
 import AuthImage from '../../components/auth/AuthImage';
 import OtpForm from '../../components/auth/OtpForm';
+import ThemeToggle from '../../components/common/ThemeToggle';
 
 const VerifyEmail = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-light">
-      <div className="relative w-full max-w-5xl h-[720px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-light dark:bg-dark-bg">
+      <div className="relative w-full max-w-5xl h-[720px] bg-white dark:bg-dark-surface rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        <ThemeToggle className="absolute top-3 right-3" />
         <div className="w-full md:w-1/2 h-full hidden md:block">
           <AuthImage className="w-full h-full object-cover" alt="EMS Email Verification" />
         </div>
         <div className="w-full md:w-1/2 h-full flex flex-col justify-center p-6 md:p-12 overflow-y-auto">
           <div className="max-w-md mx-auto w-full">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 mx-auto mb-4 bg-light rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-light dark:bg-dark-bg rounded-full flex items-center justify-center">
                 <svg
                   className="w-8 h-8 text-primary"
                   fill="none"
@@ -27,8 +29,8 @@ const VerifyEmail = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-3xl font-bold text-dark mb-2">Verify Your Email</h1>
-              <p className="text-gray-600">
+              <h1 className="text-3xl font-bold text-dark dark:text-white mb-2">Verify Your Email</h1>
+              <p className="text-gray-600 dark:text-gray-300">
                 We've sent a 6-digit code to your email address
               </p>
             </div>

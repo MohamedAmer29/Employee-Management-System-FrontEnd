@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useForm, type SubmitHandler, type FieldErrors } from "react-hook-form";
+import { Lock, Eye, EyeOff } from "lucide-react";
 import { useRegister } from "../../features/auth/auth.hooks";
 import type { RegisterData } from "../../api/auth.api";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +25,8 @@ const RegisterForm = () => {
   const navigate = useNavigate();
   const { mutate: registerUser } = useRegister();
   const password = watch("password");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmit: SubmitHandler<RegisterData> = (data) => {
     registerUser(data, {
@@ -50,10 +54,22 @@ const RegisterForm = () => {
   };
 
   const inputClasses = (hasError: boolean) => `
-    w-full px-3.5 py-2 text-sm rounded-lg border bg-white
+    w-full px-3.5 py-2 text-sm rounded-lg border bg-white dark:bg-dark-surface dark:text-gray-100 dark:placeholder-gray-500
     focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
     transition-all duration-200
-    ${hasError ? "border-red-500" : "border-gray-300"}
+    ${hasError ? "border-red-500" : "border-gray-300 dark:border-gray-600"}
+  `;
+
+  const passwordInputClasses = (hasError: boolean) => `
+    w-full pl-8 pr-8 py-2 text-sm rounded-lg border bg-white dark:bg-dark dark:text-gray-100 dark:placeholder-gray-500
+    focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+    transition-all duration-200
+    ${hasError ? "border-red-500" : "border-gray-300 dark:border-gray-600"}
+  `;
+
+  const passwordIconClasses = (hasError: boolean) => `
+    absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none
+    ${hasError ? "text-red-500" : "text-gray-400 dark:text-gray-500"}
   `;
 
   return (
@@ -62,7 +78,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="firstName"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             First Name{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -89,7 +105,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="lastName"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Last Name{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -118,7 +134,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="country"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Country{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -145,7 +161,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="city"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             City{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -174,7 +190,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="phoneNumber"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Phone Number{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -207,7 +223,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="nationalId"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             National ID{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -241,7 +257,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="username"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Email{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -274,7 +290,7 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="role"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Role{" "}
             <span className="text-red-500" aria-hidden="true">
@@ -307,33 +323,44 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="password"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Password{" "}
             <span className="text-red-500" aria-hidden="true">
               *
             </span>
           </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            {...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 8,
-                message: "Min 8 chars",
-              },
-              pattern: {
-                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
-                message: "Req: upper, lower, number, special",
-              },
-            })}
-            className={inputClasses(!!errors.password)}
-            aria-invalid={errors.password ? "true" : "false"}
-            disabled={isSubmitting}
-          />
+          <div className="relative">
+            <Lock className={passwordIconClasses(!!errors.password)} aria-hidden="true" />
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Min 8 chars",
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
+                  message: "Req: upper, lower, number, special",
+                },
+              })}
+              className={passwordInputClasses(!!errors.password)}
+              aria-invalid={errors.password ? "true" : "false"}
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
+            </button>
+          </div>
           {errors.password && (
             <p className="mt-0.5 text-xs text-red-500" role="alert">
               {getErrorMessage(errors.password)}
@@ -344,26 +371,37 @@ const RegisterForm = () => {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-xs font-medium text-gray-700 mb-1"
+            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Confirm Password{" "}
             <span className="text-red-500" aria-hidden="true">
               *
             </span>
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            {...register("confirmPassword", {
-              required: "Confirm password",
-              validate: validateConfirmPassword,
-            })}
-            className={inputClasses(!!errors.confirmPassword)}
-            aria-invalid={errors.confirmPassword ? "true" : "false"}
-            disabled={isSubmitting}
-          />
+          <div className="relative">
+            <Lock className={passwordIconClasses(!!errors.confirmPassword)} aria-hidden="true" />
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              {...register("confirmPassword", {
+                required: "Confirm password",
+                validate: validateConfirmPassword,
+              })}
+              className={passwordInputClasses(!!errors.confirmPassword)}
+              aria-invalid={errors.confirmPassword ? "true" : "false"}
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
+            </button>
+          </div>
           {errors.confirmPassword && (
             <p className="mt-0.5 text-xs text-red-500" role="alert">
               {getErrorMessage(errors.confirmPassword)}
@@ -380,7 +418,7 @@ const RegisterForm = () => {
           focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1
           ${
             !isValid || isSubmitting
-              ? "opacity-50 bg-gray-400 cursor-not-allowed"
+              ? "opacity-50 bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
               : "bg-primary-dark hover:bg-dark cursor-pointer shadow-md"
           }
         `}

@@ -1,4 +1,4 @@
-import api from './axios';
+import api from "./axios";
 
 export interface RegisterData {
   firstName: string;
@@ -32,8 +32,18 @@ export interface ResendOtpData {
 export const authApi = {
   register: (data: RegisterData) => {
     // Extract only the fields expected by the backend
-    const { firstName, lastName, country, city, phoneNumber, nationalId, username, password, role } = data;
-    return api.post('/auth/register', {
+    const {
+      firstName,
+      lastName,
+      country,
+      city,
+      phoneNumber,
+      nationalId,
+      username,
+      password,
+      role,
+    } = data;
+    return api.post("/auth/register", {
       firstName,
       lastName,
       country,
@@ -47,10 +57,11 @@ export const authApi = {
   },
   login: (data: LoginData) => {
     const { username, password } = data;
-    return api.post('/auth/login', { username, password });
+    return api.post("/auth/login", { username, password });
   },
-  verifyEmail: (data: VerifyEmailData) => api.post('/auth/verify-email', data),
-  resendVerificationOtp: (data: ResendOtpData) => api.post('/auth/resend-verification-otp', data),
-  logout: () => api.post('/auth/logout'),
-  getMe: () => api.get('/auth/me'),
+  verifyEmail: (data: VerifyEmailData) => api.post("/auth/verify-email", data),
+  resendVerificationOtp: (data: ResendOtpData) =>
+    api.post("/auth/resend-verification-otp", data),
+  logout: () => api.post("/auth/logout"),
+  getMe: () => api.get("/auth/me"),
 };

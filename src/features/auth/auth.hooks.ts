@@ -1,21 +1,24 @@
-import { useMutation } from '@tanstack/react-query';
-import { authApi } from '../../api/auth.api';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { setVerificationEmail, clearVerificationData } from '../../utils/cookies';
+import { useMutation } from "@tanstack/react-query";
+import { authApi } from "../../api/auth.api";
+import { toast } from "react-toastify";
+import {
+  setVerificationEmail,
+  clearVerificationData,
+} from "../../utils/cookies";
+import { useNavigate } from "react-router-dom";
 
 export const useRegister = () => {
   return useMutation({
     mutationFn: authApi.register,
     onSuccess: (data) => {
-      toast.success('Registration successful! Please verify your email.');
+      toast.success("Registration successful! Please verify your email.");
       if (data.data?.username || data.data?.email) {
         const email = data.data.username || data.data.email;
         setVerificationEmail(email);
       }
     },
     onError: (error) => {
-      toast.error(error.message || 'Registration failed');
+      toast.error(error.message || "Registration failed");
     },
   });
 };
@@ -26,12 +29,12 @@ export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: authApi.verifyEmail,
     onSuccess: () => {
-      toast.success('Email verified successfully!');
+      toast.success("Email verified successfully!");
       clearVerificationData();
-      navigate('/login');
+      navigate("/login");
     },
     onError: (error) => {
-      toast.error(error.message || 'Verification failed');
+      toast.error(error.message || "Verification failed");
     },
   });
 };
@@ -40,10 +43,10 @@ export const useResendVerificationOtp = () => {
   return useMutation({
     mutationFn: authApi.resendVerificationOtp,
     onSuccess: () => {
-      toast.success('Verification code resent!');
+      toast.success("Verification code resent!");
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to resend code');
+      toast.error(error.message || "Failed to resend code");
     },
   });
 };
@@ -54,12 +57,12 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: () => {
-      toast.success('Login successful!');
+      toast.success("Login successful!");
       clearVerificationData();
-      navigate('/home');
+      navigate("/home");
     },
     onError: (error) => {
-      toast.error(error.message || 'Login failed');
+      toast.error(error.message || "Login failed");
     },
   });
 };
@@ -70,12 +73,12 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      toast.success('Logged out successfully!');
-      navigate('/login');
+      toast.success("Logged out successfully!");
+      navigate("/login");
     },
     onError: (error) => {
-      toast.error(error.message || 'Logout failed');
-      navigate('/login');
+      toast.error(error.message || "Logout failed");
+      navigate("/login");
     },
   });
 };

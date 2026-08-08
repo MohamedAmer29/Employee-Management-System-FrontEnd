@@ -105,14 +105,14 @@ const OtpForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <div className="text-center mb-6">
-        <p className="text-gray-600 text-sm mb-2">
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
           Enter the 6-digit verification code sent to your email.
         </p>
         <p className="text-primary font-medium text-lg break-all">{email}</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Verification Code <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="flex justify-center">
@@ -131,8 +131,8 @@ const OtpForm = () => {
                 {...props}
                 disabled={isVerifying}
                 className="
-                  w-11 h-12 sm:w-12 sm:h-14 rounded-lg border border-gray-300 bg-white
-                  text-center text-lg sm:text-2xl font-semibold
+                  w-11 h-12 sm:w-12 sm:h-14 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-surface
+                  text-center text-lg sm:text-2xl font-semibold text-gray-900 dark:text-gray-100
                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                   disabled:opacity-70 disabled:cursor-not-allowed
                 "
@@ -165,8 +165,8 @@ const OtpForm = () => {
         {isVerifying ? 'Verifying...' : 'Verify Email'}
       </button>
 
-      <div className="space-y-3 pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-center text-sm text-gray-600">
+      <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-center text-sm text-gray-600 dark:text-gray-300">
           <span className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -176,7 +176,7 @@ const OtpForm = () => {
         </div>
 
         <div className="text-center">
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             Resend attempts: <span className="font-medium">{attempts} / 3</span>
           </p>
           <button
@@ -196,7 +196,7 @@ const OtpForm = () => {
             {isResending || isResendingApi ? 'Sending...' : 'Resend Verification Code'}
           </button>
           {attempts >= 3 && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               Maximum resend attempts reached. Please contact support.
             </p>
           )}

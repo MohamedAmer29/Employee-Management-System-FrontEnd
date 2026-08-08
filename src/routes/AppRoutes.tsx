@@ -1,9 +1,9 @@
-import { Route, Routes, Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import Login from '../pages/auth/Login';
-import Register from '../pages/auth/Register';
-import VerifyEmail from '../pages/auth/VerifyEmail';
-import Home from '../pages/Home';
+import { Route, Routes, Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import VerifyEmail from "../pages/auth/VerifyEmail";
+import Home from "../pages/Home";
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector(

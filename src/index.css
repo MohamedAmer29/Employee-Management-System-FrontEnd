@@ -1,10 +1,14 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-dark: #112D4E;
   --color-primary-dark: #0D47A1;
   --color-primary: #3F72AF;
   --color-light: #E3F2FD;
+  --color-dark-bg: #0A1C33;
+  --color-dark-surface: #122B4B;
 }
 
 :root {
@@ -12,6 +16,13 @@
   --color-primary-dark: #0D47A1;
   --color-primary: #3F72AF;
   --color-light: #E3F2FD;
+  --color-dark-bg: #0A1C33;
+  --color-dark-surface: #122B4B;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 * {
@@ -29,12 +40,24 @@ body {
   min-height: 100vh;
 }
 
+.dark body {
+  background-color: var(--color-dark-bg);
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
   box-shadow: 0 0 0 30px white inset !important;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--color-dark) inset !important;
+  box-shadow: 0 0 0 30px var(--color-dark) inset !important;
 }
 
 @keyframes slideIn {

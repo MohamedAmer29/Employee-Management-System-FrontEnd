@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import { useLogout } from '@/features/auth/auth.hooks';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '@/store/slices/authSlice';
+import ThemeToggle from '@/components/common/ThemeToggle';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -24,9 +25,10 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
-        <div className="w-20 h-20 mx-auto mb-6 bg-light rounded-full flex items-center justify-center">
+    <div className="min-h-screen bg-light dark:bg-dark-bg flex items-center justify-center p-4">
+      <div className="relative w-full max-w-md bg-white dark:bg-dark-surface rounded-2xl shadow-xl p-8 text-center">
+        <ThemeToggle className="absolute top-3 right-3" />
+        <div className="w-20 h-20 mx-auto mb-6 bg-light dark:bg-dark-bg rounded-full flex items-center justify-center">
           <svg
             className="w-10 h-10 text-primary"
             fill="none"
@@ -42,30 +44,30 @@ const Home = () => {
             />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold text-dark mb-2">
+        <h1 className="text-3xl font-bold text-dark dark:text-white mb-2">
           Welcome, {displayName}
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 dark:text-gray-300 mb-8">
           You have successfully logged into the Employee Management System.
         </p>
-        <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-          <h2 className="font-medium text-gray-700 mb-2">User Information</h2>
+        <div className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 mb-6 text-left">
+          <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-2">User Information</h2>
           <dl className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <dt className="text-gray-500">Email</dt>
-              <dd className="font-medium text-gray-900">
+              <dt className="text-gray-500 dark:text-gray-400">Email</dt>
+              <dd className="font-medium text-gray-900 dark:text-gray-100">
                 {user?.username || 'N/A'}
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Role</dt>
-              <dd className="font-medium text-gray-900">
+              <dt className="text-gray-500 dark:text-gray-400">Role</dt>
+              <dd className="font-medium text-gray-900 dark:text-gray-100">
                 {user?.role || 'N/A'}
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Name</dt>
-              <dd className="font-medium text-gray-900">
+              <dt className="text-gray-500 dark:text-gray-400">Name</dt>
+              <dd className="font-medium text-gray-900 dark:text-gray-100">
                 {user?.firstName || ''} {user?.lastName || ''}
               </dd>
             </div>
