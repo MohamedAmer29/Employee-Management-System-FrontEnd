@@ -29,6 +29,17 @@ export interface ResendOtpData {
   email: string;
 }
 
+export interface LoginResponse {
+  date: string;
+  message: string;
+  accessToken: string;
+}
+
+export interface RefreshTokenResponse {
+  message: string;
+  accessToken: string;
+}
+
 export const authApi = {
   register: (data: RegisterData) => {
     // Extract only the fields expected by the backend
@@ -57,11 +68,12 @@ export const authApi = {
   },
   login: (data: LoginData) => {
     const { username, password } = data;
-    return api.post("/auth/login", { username, password });
+    return api.post<LoginResponse>("/auth/login", { username, password });
   },
   verifyEmail: (data: VerifyEmailData) => api.post("/auth/verify-email", data),
   resendVerificationOtp: (data: ResendOtpData) =>
     api.post("/auth/resend-verification-otp", data),
   logout: () => api.post("/auth/logout"),
+  refreshToken: () => api.post<RefreshTokenResponse>("/auth/refresh-token"),
   getMe: () => api.get("/auth/me"),
 };

@@ -1,84 +1,407 @@
-import { useSelector } from 'react-redux';
-import { useLogout } from '@/features/auth/auth.hooks';
-import { useNavigate } from 'react-router-dom';
-import type { User } from '@/store/slices/authSlice';
-import ThemeToggle from '@/components/common/ThemeToggle';
+import { useMemo, useState, type ReactNode } from "react";
+import { useSelector } from "react-redux";
+import type { LucideIcon } from "lucide-react";
+import {
+  Users,
+  CalendarCheck,
+  CalendarDays,
+  TrendingUp,
+  Building2,
+  Bell,
+  LogIn,
+  Ban,
+  UserPlus,
+  Pencil,
+  RefreshCw,
+  ScrollText,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import type { RootState } from "@/store/store";
+import { useCurrentUser } from "@/features/user/user.hooks";
+import { useAdminDashboard } from "@/features/dashboard/dashboard.hooks";
+import StatCard from "@/components/dashboard/StatCard";
+import {
+  DoughnutChartCard,
+  BarChartCard,
+} from "@/components/dashboard/charts";
+import type { RecentActivity } from "@/api/user.api";
 
-const Home = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector(
-    (state: { auth: { user: User | null; isAuthenticated: boolean } }) =>
-      state.auth,
-  );
-  const { mutate: logout } = useLogout();
+const ACTIVITIES_PER_PAGE = 7;
 
-  const handleLogout = () => {
-    logout();
-  };
+const ChartSkeleton = () => (
+  <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm animate-pulse">
+    <div className="h-3 w-32 rounded bg-gray-200 dark:bg-white/10" />
+    <div className="mt-4 h-40 rounded-lg bg-gray-200 dark:bg-white/10" />
+  </div>
+);
 
-  const displayName =
-    user?.firstName || user?.username || user?.email || 'User';
+const SkeletonCard = () => (
+  <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm animate-pulse">
+    <div className="flex items-start justify-between">
+      <div className="flex-1">
+        <div className="h-3 w-24 rounded bg-gray-200 dark:bg-white/10" />
+        <div className="mt-2 h-7 w-16 rounded bg-gray-200 dark:bg-white/10" />
+        <div className="mt-2 h-3 w-32 rounded bg-gray-200 dark:bg-white/10" />
+      </div>
+      <div className="h-11 w-11 rounded-xl bg-gray-200 dark:bg-white/10" />
+    </div>
+  </div>
+);
 
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
+const activityIcon: Record<string, { icon: LucideIcon; className: string }> = {
+  LOGIN: { icon: LogIn, className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  LOGIN_FAILED: { icon: Ban, className: "bg-red-500/10 text-red-600 dark:text-red-400" },
+  CREATE: { icon: UserPlus, className: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
+  UPDATE: { icon: Pencil, className: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+};
+
+const getActivityIcon = (action: string) =>
+  activityIcon[action] ?? { icon: ScrollText, className: "bg-gray-500/10 text-gray-600 dark:text-gray-400" };
+
+const ActivityItem = ({ activity }: { activity: RecentActivity }) => {
+  const { icon: Icon, className } = getActivityIcon(activity.action);
 
   return (
-    <div className="min-h-screen bg-light dark:bg-dark-bg flex items-center justify-center p-4">
-      <div className="relative w-full max-w-md bg-white dark:bg-dark-surface rounded-2xl shadow-xl p-8 text-center">
-        <ThemeToggle className="absolute top-3 right-3" />
-        <div className="w-20 h-20 mx-auto mb-6 bg-light dark:bg-dark-bg rounded-full flex items-center justify-center">
-          <svg
-            className="w-10 h-10 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-bold text-dark dark:text-white mb-2">
-          Welcome, {displayName}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-8">
-          You have successfully logged into the Employee Management System.
+    <li className="flex items-start gap-3">
+      <span className={`flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${className}`}>
+        <Icon className="w-4 h-4" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+          {activity.description}
         </p>
-        <div className="bg-gray-50 dark:bg-dark-bg rounded-lg p-4 mb-6 text-left">
-          <h2 className="font-medium text-gray-700 dark:text-gray-200 mb-2">User Information</h2>
-          <dl className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-gray-500 dark:text-gray-400">Email</dt>
-              <dd className="font-medium text-gray-900 dark:text-gray-100">
-                {user?.username || 'N/A'}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500 dark:text-gray-400">Role</dt>
-              <dd className="font-medium text-gray-900 dark:text-gray-100">
-                {user?.role || 'N/A'}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500 dark:text-gray-400">Name</dt>
-              <dd className="font-medium text-gray-900 dark:text-gray-100">
-                {user?.firstName || ''} {user?.lastName || ''}
-              </dd>
-            </div>
-          </dl>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+          {activity.user !== "null null" ? activity.user : "Unknown"} · {activity.entity}
+        </p>
+      </div>
+    </li>
+  );
+};
+
+const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
+  <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+    <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+      {title}
+    </h2>
+    {children}
+  </section>
+);
+
+const Home = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const currentUserQuery = useCurrentUser();
+  const dashboardQuery = useAdminDashboard();
+
+  const dashboard = dashboardQuery.data;
+  const displayName =
+    currentUserQuery.data?.firstName ||
+    user?.firstName ||
+    user?.username ||
+    "there";
+
+  const activities = dashboard?.recentActivities ?? [];
+  const totalPages = Math.max(1, Math.ceil(activities.length / ACTIVITIES_PER_PAGE));
+  const [activityPage, setActivityPage] = useState(0);
+
+  // Clamp during render so a shrunken list can't leave the page out of range.
+  const page = Math.min(activityPage, totalPages - 1);
+
+  const pageActivities = activities.slice(
+    page * ACTIVITIES_PER_PAGE,
+    (page + 1) * ACTIVITIES_PER_PAGE,
+  );
+
+  const employeeChartItems = useMemo(() => {
+    if (!dashboard) return [];
+    return [
+      { label: "Active", value: dashboard.employees.active, color: "#10B981" },
+      { label: "Inactive", value: dashboard.employees.inactive, color: "#EF4444" },
+    ];
+  }, [dashboard]);
+
+  const attendanceChartItems = useMemo(() => {
+    if (!dashboard) return [];
+    return [
+      { label: "Present", value: dashboard.attendance.presentToday, color: "#10B981" },
+      { label: "Absent", value: dashboard.attendance.absentToday, color: "#EF4444" },
+    ];
+  }, [dashboard]);
+
+  const leaveChartItems = useMemo(() => {
+    if (!dashboard) return [];
+    return [
+      { label: "Pending", value: dashboard.leave.pending, color: "#F59E0B" },
+      { label: "Approved", value: dashboard.leave.approved, color: "#10B981" },
+      { label: "Rejected", value: dashboard.leave.rejected, color: "#EF4444" },
+    ];
+  }, [dashboard]);
+
+  const departmentChartItems = useMemo(() => {
+    if (!dashboard) return [];
+    return dashboard.departments.employeesPerDepartment.map((dept) => ({
+      label: dept.name ?? "Unassigned",
+      value: dept.count ?? 0,
+    }));
+  }, [dashboard]);
+
+  const performanceChartItems = useMemo(() => {
+    if (!dashboard) return [];
+    return dashboard.performance.performanceDistribution.map((item) => ({
+      label: item.label ?? "—",
+      value: item.value ?? 0,
+    }));
+  }, [dashboard]);
+
+  const statCards = [
+    {
+      icon: Users,
+      label: "Employees",
+      value: dashboard?.employees.total ?? "—",
+      hint: dashboard
+        ? `${dashboard.employees.active} active · ${dashboard.employees.inactive} inactive · ${dashboard.employees.newThisMonth} new this month`
+        : undefined,
+    },
+    {
+      icon: CalendarCheck,
+      label: "Attendance Today",
+      value: dashboard?.attendance.presentToday ?? "—",
+      hint: dashboard
+        ? `${dashboard.attendance.checkedInToday} checked in · ${dashboard.attendance.checkedOutToday} checked out · ${dashboard.attendance.absentToday} absent`
+        : undefined,
+    },
+    {
+      icon: CalendarDays,
+      label: "Leave Requests",
+      value: dashboard?.leave.total ?? "—",
+      hint: dashboard
+        ? `${dashboard.leave.pending} pending · ${dashboard.leave.approved} approved · ${dashboard.leave.rejected} rejected`
+        : undefined,
+    },
+    {
+      icon: TrendingUp,
+      label: "Performance",
+      value:
+        dashboard && dashboard.performance.averageRating > 0
+          ? `${dashboard.performance.averageRating.toFixed(1)} / 5`
+          : "—",
+      hint: dashboard
+        ? `${dashboard.performance.totalReviews} total reviews · ${dashboard.performance.reviewsThisMonth} this month`
+        : undefined,
+    },
+  ] as const;
+
+  const loadError = dashboardQuery.isError ? (
+    <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 p-6 text-center">
+      <p className="font-semibold text-red-700 dark:text-red-300">
+        We couldn't load the dashboard.
+      </p>
+      <button
+        type="button"
+        onClick={() => dashboardQuery.refetch()}
+        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      >
+        <RefreshCw className="w-4 h-4" aria-hidden="true" />
+        Try again
+      </button>
+    </div>
+  ) : null;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
+          Dashboard
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          An overview of your organization's activity.
+        </p>
+      </div>
+
+      <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+        <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
+        <div className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
+        <div className="relative">
+          <p className="text-sm font-medium text-white/80">Welcome back,</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">{displayName} 👋</h2>
+          <p className="text-sm text-white/75 mt-2 max-w-xl">
+            Here's what's happening with your organization today.
+          </p>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full py-3 px-4 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-        >
-          Logout
-        </button>
+      </section>
+
+      {loadError}
+
+      {/* Stat cards */}
+      {dashboardQuery.isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5" role="status" aria-label="Loading dashboard">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+          {statCards.map((card) => (
+            <StatCard
+              key={card.label}
+              icon={card.icon}
+              label={card.label}
+              value={card.value}
+              hint={card.hint}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Analytics charts */}
+      <section aria-label="Analytics charts">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+          Analytics
+        </h2>
+        {dashboardQuery.isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5" role="status" aria-label="Loading charts">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <ChartSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              <DoughnutChartCard title="Employees" items={employeeChartItems} />
+              <DoughnutChartCard title="Attendance Today" items={attendanceChartItems} />
+              <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
+            </div>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-5">
+              <BarChartCard title="Employees per Department" items={departmentChartItems} />
+              <BarChartCard title="Performance Distribution" items={performanceChartItems} />
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* Secondary panels */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+        {/* Recent activities */}
+        <div className="xl:col-span-2">
+          <Panel title="Recent Activities">
+            {dashboardQuery.isLoading ? (
+              <div className="space-y-3 animate-pulse">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-gray-200 dark:bg-white/10" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-white/10" />
+                      <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-white/10" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : activities.length ? (
+              <>
+                <ul className="space-y-4">
+                  {pageActivities.map((activity) => (
+                    <ActivityItem key={activity.id} activity={activity} />
+                  ))}
+                </ul>
+                {totalPages > 1 && (
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      {activities.length} activities
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setActivityPage((current) => Math.max(0, current - 1))}
+                        disabled={page === 0}
+                        aria-label="Previous activities"
+                        className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      >
+                        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
+                        Page {page + 1} of {totalPages}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setActivityPage((current) => Math.min(totalPages - 1, current + 1))
+                        }
+                        disabled={page >= totalPages - 1}
+                        aria-label="Next activities"
+                        className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      >
+                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
+                No recent activity yet.
+              </p>
+            )}
+          </Panel>
+        </div>
+
+        {/* Summary column */}
+        <div className="space-y-4 sm:space-y-5">
+          <Panel title="Departments">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-primary/10 text-primary">
+                  <Building2 className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+                    {dashboard?.departments.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total departments</p>
+                </div>
+              </div>
+            )}
+          </Panel>
+
+          <Panel title="Notifications">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Bell className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+                    {dashboard?.notifications.unread ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Unread · {dashboard?.notifications.total ?? 0} total
+                  </p>
+                </div>
+              </div>
+            )}
+          </Panel>
+
+          <Panel title="Attendance Rate">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <CalendarCheck className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+                    {dashboard?.attendance.attendanceRate ?? 0}%
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Today's rate</p>
+                </div>
+              </div>
+            )}
+          </Panel>
+        </div>
       </div>
     </div>
   );

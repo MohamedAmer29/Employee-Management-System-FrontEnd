@@ -6,6 +6,8 @@ import {
   clearVerificationData,
 } from "../../utils/cookies";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuth, clearUser } from "../../store/slices/authSlice";
 
 export const useRegister = () => {
   return useMutation({
@@ -53,13 +55,20 @@ export const useResendVerificationOtp = () => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const accessToken = data.data?.accessToken;
+      if (!accessToken) {
+        toast.error("Login response missing access token");
+        return;
+      }
+      dispatch(setAuth({ accessToken }));
       toast.success("Login successful!");
       clearVerificationData();
-      navigate("/home");
+      navigate("/home", { replace: true });
     },
     onError: (error) => {
       toast.error(error.message || "Login failed");
@@ -69,16 +78,22 @@ export const useLogin = () => {
 
 export const useLogout = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(clearUser());
+    navigate("/login", { replace: true });
+  };
 
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
       toast.success("Logged out successfully!");
-      navigate("/login");
+      handleLogout();
     },
     onError: (error) => {
       toast.error(error.message || "Logout failed");
-      navigate("/login");
+      handleLogout();
     },
   });
 };

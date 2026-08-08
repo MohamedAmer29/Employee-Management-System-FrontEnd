@@ -6,6 +6,12 @@ export const COOKIE_KEYS = {
   RESEND_COUNTDOWN: 'resend_countdown',
 } as const;
 
+// Companion marker the backend sets alongside the httpOnly refresh_token
+// cookie, so the frontend can tell a session exists without reading the token.
+export const hasRefreshCookie = (): boolean => {
+  return Boolean(Cookies.get('refresh_token_present'));
+};
+
 export const setVerificationEmail = (email: string) => {
   Cookies.set(COOKIE_KEYS.VERIFICATION_EMAIL, email, { expires: 1, secure: true, sameSite: 'lax' });
 };

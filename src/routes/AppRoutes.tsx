@@ -4,11 +4,19 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 import Home from "../pages/Home";
+import Profile from "../pages/Profile";
+import DashboardLayout from "../layouts/DashboardLayout";
+import FullPageLoader from "../components/common/FullPageLoader";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useSelector(
-    (state: { auth: { isAuthenticated: boolean } }) => state.auth,
+  const { isAuthenticated, loading } = useSelector(
+    (state: { auth: { isAuthenticated: boolean; loading: boolean } }) =>
+      state.auth,
   );
+
+  if (loading) {
+    return <FullPageLoader />;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -18,9 +26,14 @@ const ProtectedRoute = () => {
 };
 
 const PublicRoute = () => {
-  const { isAuthenticated } = useSelector(
-    (state: { auth: { isAuthenticated: boolean } }) => state.auth,
+  const { isAuthenticated, loading } = useSelector(
+    (state: { auth: { isAuthenticated: boolean; loading: boolean } }) =>
+      state.auth,
   );
+
+  if (loading) {
+    return <FullPageLoader />;
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/home" replace />;
@@ -39,8 +52,11 @@ const AppRoutes = () => {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/home" element={<Home />} />
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+        </Route>
       </Route>
     </Routes>
   );

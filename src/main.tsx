@@ -2,12 +2,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ToastContainer } from "react-toastify";
+import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { store } from "./store/store";
 import { ThemeProvider } from "./hooks/ThemeProvider";
 import { useTheme } from "./hooks/useTheme";
+import { useSessionRestore } from "./features/auth/useSessionRestore";
+import { useSessionMonitor } from "./features/auth/useSessionMonitor";
 import AppRoutes from "./routes/AppRoutes";
 import "./index.css";
 
@@ -22,6 +24,13 @@ const queryClient = new QueryClient({
       retry: 0,
     },
   },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "An error occurred";
+      toast.error(message, { toastId: `query-error:${message}` });
+    },
+  }),
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -47,12 +56,26 @@ const ThemedToastContainer = () => {
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
+const SessionRestore = () => {
+  useSessionRestore();
+  return null;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+const SessionMonitor = () => {
+  useSessionMonitor();
+  return null;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
 const App = () => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <ThemeProvider>
+            <SessionRestore />
+            <SessionMonitor />
             <AppRoutes />
             <ThemedToastContainer />
           </ThemeProvider>
