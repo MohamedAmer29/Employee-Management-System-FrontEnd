@@ -1,9 +1,12 @@
+import type { KeyboardEvent, FocusEvent } from "react";
 import { Search } from "lucide-react";
 
 interface SearchInputProps {
   placeholder?: string;
   value?: string;
   onChange?: (value: string) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onFocus?: (event: FocusEvent<HTMLInputElement>) => void;
   className?: string;
 }
 
@@ -11,6 +14,8 @@ const SearchInput = ({
   placeholder = "Search...",
   value,
   onChange,
+  onKeyDown,
+  onFocus,
   className = "",
 }: SearchInputProps) => {
   return (
@@ -24,6 +29,8 @@ const SearchInput = ({
         role="searchbox"
         value={value}
         onChange={(event) => onChange?.(event.target.value)}
+        onKeyDown={onKeyDown}
+        onFocus={onFocus}
         placeholder={placeholder}
         aria-label={placeholder}
         className="

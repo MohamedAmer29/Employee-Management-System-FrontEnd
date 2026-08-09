@@ -1,5 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../api/auth.api";
+import { userApi } from "../../api/user.api";
 import { toast } from "react-toastify";
 import {
   setVerificationEmail,
@@ -7,7 +8,7 @@ import {
 } from "../../utils/cookies";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setAuth, clearUser } from "../../store/slices/authSlice";
+import { setAuth, setUser, clearUser } from "../../store/slices/authSlice";
 
 export const useRegister = () => {
   return useMutation({
@@ -56,6 +57,7 @@ export const useResendVerificationOtp = () => {
 export const useLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: authApi.login,
@@ -68,6 +70,15 @@ export const useLogin = () => {
       dispatch(setAuth({ accessToken }));
       toast.success("Login successful!");
       clearVerificationData();
+
+      userApi
+        .getCurrentUser(accessToken)
+        .then((response) => {
+          queryClient.setQueryData(["currentUser"], response.data);
+          dispatch(setUser(response.data));
+        })
+        .catch(() => undefined);
+
       navigate("/home", { replace: true });
     },
     onError: (error) => {
@@ -79,9 +90,11 @@ export const useLogin = () => {
 export const useLogout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const handleLogout = () => {
     dispatch(clearUser());
+    queryClient.removeQueries({ queryKey: ["currentUser"] });
     navigate("/login", { replace: true });
   };
 

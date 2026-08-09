@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { authApi } from "../../api/auth.api";
-import { setAuth, clearUser, setLoading } from "../../store/slices/authSlice";
+import { userApi } from "../../api/user.api";
+import { setAuth, setUser, clearUser, setLoading } from "../../store/slices/authSlice";
 import { getAuthToken } from "../../utils/authToken";
 import { hasRefreshCookie } from "../../utils/cookies";
 import { getTimeUntilExpiryMs } from "../../utils/jwt";
@@ -9,11 +11,23 @@ import { SESSION_WARNING_THRESHOLD_MS } from "./session.constants";
 
 export const useSessionRestore = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const attempted = useRef(false);
 
   useEffect(() => {
     if (attempted.current) return;
     attempted.current = true;
+
+    const seedCurrentUser = (accessToken: string) =>
+      userApi
+        .getCurrentUser(accessToken)
+        .then((response) => {
+          queryClient.setQueryData(["currentUser"], response.data);
+          dispatch(setUser(response.data));
+        })
+        .catch(() => {
+          queryClient.removeQueries({ queryKey: ["currentUser"] });
+        });
 
     const restore = async () => {
       dispatch(setLoading(true));
@@ -29,6 +43,7 @@ export const useSessionRestore = () => {
           remainingMs > SESSION_WARNING_THRESHOLD_MS
         ) {
           dispatch(setAuth({ accessToken: storedToken }));
+          await seedCurrentUser(storedToken);
           dispatch(setLoading(false));
           return;
         }
@@ -40,6 +55,7 @@ export const useSessionRestore = () => {
       // without firing a pointless request.
       if (!hasRefreshCookie()) {
         dispatch(clearUser());
+        queryClient.removeQueries({ queryKey: ["currentUser"] });
         dispatch(setLoading(false));
         return;
       }
@@ -49,6 +65,7 @@ export const useSessionRestore = () => {
         const accessToken = response.data?.accessToken;
         if (accessToken) {
           dispatch(setAuth({ accessToken }));
+          await seedCurrentUser(accessToken);
         } else {
           dispatch(clearUser());
         }
@@ -64,5 +81,5 @@ export const useSessionRestore = () => {
     };
 
     void restore();
-  }, [dispatch]);
+  }, [dispatch, queryClient]);
 };

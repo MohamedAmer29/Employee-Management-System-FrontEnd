@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { userApi } from "../../api/user.api";
 import { setUser } from "../../store/slices/authSlice";
@@ -32,11 +32,13 @@ export const useCurrentUser = () => {
 
 export const useUpdateUser = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: userApi.updateUser,
     onSuccess: (data) => {
       dispatch(setUser(data.data));
+      queryClient.setQueryData(["currentUser"], data.data);
       toast.success("Profile updated successfully!");
     },
     onError: (error) => {

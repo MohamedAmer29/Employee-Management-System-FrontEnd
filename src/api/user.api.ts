@@ -131,6 +131,12 @@ export interface AuditLogsResponse {
   };
 }
 
+export interface AuditLogDetailResponse {
+  success: boolean;
+  message: string;
+  data: AuditLog;
+}
+
 export interface User {
   id: number;
   firstName: string;
@@ -155,5 +161,7 @@ export const userApi = {
     api.patch<CurrentUser>("/users/me", data),
   getAuditLogs: (params?: AuditLogsParams) =>
     api.get<AuditLogsResponse>("/audit-logs", { params }),
+  getAuditLogById: (id: string) =>
+    api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
   getUsers: () => api.get<User[]>("/users"),
 };

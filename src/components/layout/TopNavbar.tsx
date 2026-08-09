@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Menu, Bell, ChevronDown, UserCircle, Settings, LogOut } from "lucide-react";
@@ -7,6 +7,11 @@ import ThemeToggle from "@/components/common/ThemeToggle";
 import SearchInput from "@/components/common/SearchInput";
 import Avatar from "@/components/common/Avatar";
 import { useLogout } from "@/features/auth/auth.hooks";
+import {
+  getNavGroupsForRole,
+  getNavLabel,
+  type UserRole,
+} from "@/config/navigation";
 
 interface TopNavbarProps {
   onMenuClick: () => void;
@@ -18,13 +23,34 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const { mutate: logout, isPending } = useLogout();
 
   const displayName =
     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() || user?.username || "User";
   const role = user?.role ?? "Employee";
+
+  const navGroups = getNavGroupsForRole(
+    (user?.role ?? undefined) as UserRole | undefined,
+  );
+  const navItems = navGroups.flatMap((group) => group.items);
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const results = normalizedQuery
+    ? navItems
+        .filter(
+          (item) =>
+            getNavLabel(item, role as UserRole)
+              .toLowerCase()
+              .includes(normalizedQuery) ||
+            item.path.toLowerCase().includes(normalizedQuery),
+        )
+        .slice(0, 8)
+    : [];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -46,9 +72,56 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     setMenuOpen(false);
     logout();
+  };
+
+  const navigateTo = (path: string) => {
+    setQuery("");
+    setSearchOpen(false);
+    setActiveIndex(-1);
+    navigate(path);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setQuery(value);
+    setActiveIndex(-1);
+    setSearchOpen(true);
+  };
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") {
+      setSearchOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+    if (results.length === 0) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setSearchOpen(true);
+      setActiveIndex((prev) => (prev + 1) % results.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev - 1 + results.length) % results.length);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      const item = results[activeIndex >= 0 ? activeIndex : 0];
+      if (item) navigateTo(item.path);
+    }
   };
 
   const menuItemClass = `
@@ -75,12 +148,57 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
         </button>
 
         {/* Search */}
-        <SearchInput
-          value={query}
-          onChange={setQuery}
-          placeholder="Search..."
-          className="flex-1 max-w-sm hidden md:block"
-        />
+        <div className="relative flex-1 max-w-sm hidden md:block" ref={searchRef}>
+          <SearchInput
+            value={query}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            onFocus={() => setSearchOpen(true)}
+            placeholder="Search pages..."
+          />
+          {searchOpen && normalizedQuery && (
+            <div className="absolute left-0 right-0 top-full mt-2 rounded-xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden z-50 animate-fade-in">
+              {results.length > 0 ? (
+                <ul role="listbox" aria-label="Navigation search results">
+                  {results.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.path}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={index === activeIndex}
+                          onClick={() => navigateTo(item.path)}
+                          onMouseEnter={() => setActiveIndex(index)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors cursor-pointer focus:outline-none ${
+                            index === activeIndex
+                              ? "bg-gray-50 dark:bg-white/5 text-primary"
+                              : "text-gray-700 dark:text-gray-200"
+                          }`}
+                        >
+                          <Icon
+                            className="w-4 h-4 shrink-0 text-gray-400 dark:text-gray-500"
+                            aria-hidden="true"
+                          />
+                          <span className="truncate">
+                            {getNavLabel(item, role as UserRole)}
+                          </span>
+                          <span className="ml-auto text-xs text-gray-400 dark:text-gray-500 font-mono hidden sm:inline">
+                            {item.path}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <div className="px-4 py-3 text-sm text-gray-400 dark:text-gray-500">
+                  No matching pages for "{query}"
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="flex-1 md:hidden" />
 

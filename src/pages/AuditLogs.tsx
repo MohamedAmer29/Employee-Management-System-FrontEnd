@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import {
   Filter,
   User,
@@ -53,6 +54,7 @@ const AuditLogs = () => {
   const [userIdFilter, setUserIdFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [limit, setLimit] = useState(20);
+  const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useAuditLogs(params);
   const { data: users } = useUsers();
@@ -148,8 +150,10 @@ const AuditLogs = () => {
     const userName = log.user
       ? `${log.user.firstName} ${log.user.lastName}`.toLowerCase()
       : "";
+    const userRole = log.user?.role?.toLowerCase() ?? "";
     return (
       userName.includes(query) ||
+      userRole.includes(query) ||
       log.action?.toLowerCase().includes(query) ||
       log.description?.toLowerCase().includes(query) ||
       log.entity?.toLowerCase().includes(query)
@@ -200,7 +204,7 @@ const AuditLogs = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search logs by user, action, entity, or description..."
+              placeholder="Search logs by user, role, action, entity, or description..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
@@ -370,13 +374,25 @@ const AuditLogs = () => {
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
                       IP Address
                     </th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                      <span className="sr-only">Details</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredLogs.map((log) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                      onClick={() => navigate(`/audit-logs/${log.id}`)}
+                      role="link"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/audit-logs/${log.id}`);
+                        }
+                      }}
+                      className="group cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -426,6 +442,12 @@ const AuditLogs = () => {
                         <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">
                           {log.ipAddress || "—"}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <ChevronRight
+                          className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors inline-block"
+                          aria-hidden="true"
+                        />
                       </td>
                     </tr>
                   ))}

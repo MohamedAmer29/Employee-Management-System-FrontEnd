@@ -10,6 +10,15 @@ export const useAuditLogs = (params?: AuditLogsParams) => {
   });
 };
 
+export const useAuditLog = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["auditLog", id],
+    queryFn: () =>
+      userApi.getAuditLogById(id as string).then((response) => response.data),
+    enabled: Boolean(id),
+  });
+};
+
 export const useUsers = () => {
   return useQuery({
     queryKey: ["users"],
