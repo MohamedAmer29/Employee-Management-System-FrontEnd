@@ -16,15 +16,14 @@ import {
   ScrollText,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/store/store";
 import { useCurrentUser } from "@/features/user/user.hooks";
 import { useAdminDashboard } from "@/features/dashboard/dashboard.hooks";
 import StatCard from "@/components/dashboard/StatCard";
-import {
-  DoughnutChartCard,
-  BarChartCard,
-} from "@/components/dashboard/charts";
+import { DoughnutChartCard, BarChartCard } from "@/components/dashboard/charts";
 import type { RecentActivity } from "@/api/user.api";
 
 const ACTIVITIES_PER_PAGE = 7;
@@ -50,21 +49,38 @@ const SkeletonCard = () => (
 );
 
 const activityIcon: Record<string, { icon: LucideIcon; className: string }> = {
-  LOGIN: { icon: LogIn, className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  LOGIN_FAILED: { icon: Ban, className: "bg-red-500/10 text-red-600 dark:text-red-400" },
-  CREATE: { icon: UserPlus, className: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
-  UPDATE: { icon: Pencil, className: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  LOGIN: {
+    icon: LogIn,
+    className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  LOGIN_FAILED: {
+    icon: Ban,
+    className: "bg-red-500/10 text-red-600 dark:text-red-400",
+  },
+  CREATE: {
+    icon: UserPlus,
+    className: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  },
+  UPDATE: {
+    icon: Pencil,
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
 };
 
 const getActivityIcon = (action: string) =>
-  activityIcon[action] ?? { icon: ScrollText, className: "bg-gray-500/10 text-gray-600 dark:text-gray-400" };
+  activityIcon[action] ?? {
+    icon: ScrollText,
+    className: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
+  };
 
 const ActivityItem = ({ activity }: { activity: RecentActivity }) => {
   const { icon: Icon, className } = getActivityIcon(activity.action);
 
   return (
     <li className="flex items-start gap-3">
-      <span className={`flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${className}`}>
+      <span
+        className={`flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${className}`}
+      >
         <Icon className="w-4 h-4" aria-hidden="true" />
       </span>
       <div className="min-w-0">
@@ -72,23 +88,36 @@ const ActivityItem = ({ activity }: { activity: RecentActivity }) => {
           {activity.description}
         </p>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-          {activity.user !== "null null" ? activity.user : "Unknown"} · {activity.entity}
+          {activity.user !== "null null" ? activity.user : "Unknown"} ·{" "}
+          {activity.entity}
         </p>
       </div>
     </li>
   );
 };
 
-const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
+const Panel = ({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children: ReactNode;
+  action?: ReactNode;
+}) => (
   <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-    <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-      {title}
-    </h2>
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+        {title}
+      </h2>
+      {action}
+    </div>
     {children}
   </section>
 );
 
 const Home = () => {
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUserQuery = useCurrentUser();
   const dashboardQuery = useAdminDashboard();
@@ -101,7 +130,10 @@ const Home = () => {
     "there";
 
   const activities = dashboard?.recentActivities ?? [];
-  const totalPages = Math.max(1, Math.ceil(activities.length / ACTIVITIES_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(activities.length / ACTIVITIES_PER_PAGE),
+  );
   const [activityPage, setActivityPage] = useState(0);
 
   // Clamp during render so a shrunken list can't leave the page out of range.
@@ -116,15 +148,27 @@ const Home = () => {
     if (!dashboard) return [];
     return [
       { label: "Active", value: dashboard.employees.active, color: "#10B981" },
-      { label: "Inactive", value: dashboard.employees.inactive, color: "#EF4444" },
+      {
+        label: "Inactive",
+        value: dashboard.employees.inactive,
+        color: "#EF4444",
+      },
     ];
   }, [dashboard]);
 
   const attendanceChartItems = useMemo(() => {
     if (!dashboard) return [];
     return [
-      { label: "Present", value: dashboard.attendance.presentToday, color: "#10B981" },
-      { label: "Absent", value: dashboard.attendance.absentToday, color: "#EF4444" },
+      {
+        label: "Present",
+        value: dashboard.attendance.presentToday,
+        color: "#10B981",
+      },
+      {
+        label: "Absent",
+        value: dashboard.attendance.absentToday,
+        color: "#EF4444",
+      },
     ];
   }, [dashboard]);
 
@@ -140,17 +184,20 @@ const Home = () => {
   const departmentChartItems = useMemo(() => {
     if (!dashboard) return [];
     return dashboard.departments.employeesPerDepartment.map((dept) => ({
-      label: dept.name ?? "Unassigned",
-      value: dept.count ?? 0,
+      label: dept.departmentName ?? "Unassigned",
+      value: dept.employeeCount ?? 0,
     }));
   }, [dashboard]);
 
   const performanceChartItems = useMemo(() => {
     if (!dashboard) return [];
-    return dashboard.performance.performanceDistribution.map((item) => ({
-      label: item.label ?? "—",
-      value: item.value ?? 0,
-    }));
+    return dashboard.performance.performanceDistribution.map((item) => {
+      const typedItem = item as { label?: string; value?: number };
+      return {
+        label: typedItem.label ?? "—",
+        value: typedItem.value ?? 0,
+      };
+    });
   }, [dashboard]);
 
   const statCards = [
@@ -219,11 +266,19 @@ const Home = () => {
       </div>
 
       <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
-        <div className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
+        <div
+          className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5"
+          aria-hidden="true"
+        />
         <div className="relative">
           <p className="text-sm font-medium text-white/80">Welcome back,</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">{displayName} 👋</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
+            {displayName} 👋
+          </h2>
           <p className="text-sm text-white/75 mt-2 max-w-xl">
             Here's what's happening with your organization today.
           </p>
@@ -234,7 +289,11 @@ const Home = () => {
 
       {/* Stat cards */}
       {dashboardQuery.isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5" role="status" aria-label="Loading dashboard">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5"
+          role="status"
+          aria-label="Loading dashboard"
+        >
           {Array.from({ length: 4 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
@@ -259,7 +318,11 @@ const Home = () => {
           Analytics
         </h2>
         {dashboardQuery.isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5" role="status" aria-label="Loading charts">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
+            role="status"
+            aria-label="Loading charts"
+          >
             {Array.from({ length: 3 }).map((_, index) => (
               <ChartSkeleton key={index} />
             ))}
@@ -268,12 +331,24 @@ const Home = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
               <DoughnutChartCard title="Employees" items={employeeChartItems} />
-              <DoughnutChartCard title="Attendance Today" items={attendanceChartItems} />
-              <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
+              <DoughnutChartCard
+                title="Attendance Today"
+                items={attendanceChartItems}
+              />
+              <DoughnutChartCard
+                title="Leave Requests"
+                items={leaveChartItems}
+              />
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-5">
-              <BarChartCard title="Employees per Department" items={departmentChartItems} />
-              <BarChartCard title="Performance Distribution" items={performanceChartItems} />
+              <BarChartCard
+                title="Employees per Department"
+                items={departmentChartItems}
+              />
+              <BarChartCard
+                title="Performance Distribution"
+                items={performanceChartItems}
+              />
             </div>
           </>
         )}
@@ -283,7 +358,21 @@ const Home = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
         <div className="xl:col-span-2">
-          <Panel title="Recent Activities">
+          <Panel
+            title="Recent Activities"
+            action={
+              user?.role === "Admin" ? (
+                <button
+                  type="button"
+                  onClick={() => navigate("/audit-logs")}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                >
+                  View All
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                </button>
+              ) : undefined
+            }
+          >
             {dashboardQuery.isLoading ? (
               <div className="space-y-3 animate-pulse">
                 {Array.from({ length: 4 }).map((_, index) => (
@@ -311,7 +400,9 @@ const Home = () => {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => setActivityPage((current) => Math.max(0, current - 1))}
+                        onClick={() =>
+                          setActivityPage((current) => Math.max(0, current - 1))
+                        }
                         disabled={page === 0}
                         aria-label="Previous activities"
                         className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -324,7 +415,9 @@ const Home = () => {
                       <button
                         type="button"
                         onClick={() =>
-                          setActivityPage((current) => Math.min(totalPages - 1, current + 1))
+                          setActivityPage((current) =>
+                            Math.min(totalPages - 1, current + 1),
+                          )
                         }
                         disabled={page >= totalPages - 1}
                         aria-label="Next activities"
@@ -358,7 +451,9 @@ const Home = () => {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
                     {dashboard?.departments.total ?? 0}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Total departments</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Total departments
+                  </p>
                 </div>
               </div>
             )}
@@ -396,7 +491,9 @@ const Home = () => {
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
                     {dashboard?.attendance.attendanceRate ?? 0}%
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Today's rate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Today's rate
+                  </p>
                 </div>
               </div>
             )}

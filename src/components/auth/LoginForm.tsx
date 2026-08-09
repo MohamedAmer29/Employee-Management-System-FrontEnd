@@ -100,7 +100,7 @@ const LoginForm = () => {
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary transition-colors cursor-pointer"
           >
             {showPassword ? <EyeOff className="w-[18px] h-[18px]" aria-hidden="true" /> : <Eye className="w-[18px] h-[18px]" aria-hidden="true" />}
           </button>
@@ -137,7 +137,7 @@ const LoginForm = () => {
           focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
           ${isSubmitting || !isValid
             ? 'bg-primary/50 text-white/80 cursor-not-allowed'
-            : 'bg-primary-dark hover:bg-dark shadow-md hover:shadow-lg active:scale-[0.99]'}
+            : 'bg-primary-dark hover:bg-dark shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer'}
         `}
         aria-busy={isSubmitting}
       >

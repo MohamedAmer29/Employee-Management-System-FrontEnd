@@ -158,7 +158,7 @@ const OtpForm = () => {
           focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
           ${isVerifying || !email || !isOtpValid
             ? 'bg-primary/50 text-white/80 cursor-not-allowed'
-            : 'bg-primary-dark hover:bg-dark'}
+            : 'bg-primary-dark hover:bg-dark cursor-pointer'}
         `}
         aria-busy={isVerifying}
       >
@@ -188,7 +188,7 @@ const OtpForm = () => {
               focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
               ${(!canResend || attempts >= 3 || isResending || isResendingApi)
                 ? 'text-gray-400 cursor-not-allowed'
-                : 'text-primary hover:text-primary-dark underline'}
+                : 'text-primary hover:text-primary-dark underline cursor-pointer'}
             `}
             aria-busy={isResending || isResendingApi}
             aria-disabled={!canResend || attempts >= 3}

@@ -55,7 +55,7 @@ const InfoItem = ({
         <button
           type="button"
           onClick={onEdit}
-          className="relative flex items-center justify-center h-8 w-8 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-all duration-300 group-hover:opacity-100 opacity-60"
+          className="relative flex items-center justify-center h-8 w-8 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-all duration-300 group-hover:opacity-100 opacity-60 cursor-pointer"
         >
           <Edit className="w-4 h-4" />
         </button>
@@ -306,7 +306,7 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -323,7 +323,7 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -331,7 +331,7 @@ const Profile = () => {
                 type="button"
                 onClick={handleSave}
                 disabled={updateUser.isPending}
-                className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 {updateUser.isPending ? (
                   <>

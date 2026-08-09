@@ -5,6 +5,7 @@ import Register from "../pages/auth/Register";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 import Home from "../pages/Home";
 import Profile from "../pages/Profile";
+import AuditLogs from "../pages/AuditLogs";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 
@@ -55,6 +56,7 @@ const AppRoutes = () => {
         <Route element={<DashboardLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/audit-logs" element={<AuditLogs />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

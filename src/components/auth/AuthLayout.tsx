@@ -107,7 +107,7 @@ const AuthLayout = ({
                   type="button"
                   onClick={goToLogin}
                   disabled={isTransitioning}
-                  className="text-primary font-semibold hover:text-primary-dark transition-colors focus:outline-none focus:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="text-primary font-semibold hover:text-primary-dark transition-colors cursor-pointer focus:outline-none focus:underline disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   Login
                 </button>
@@ -141,7 +141,7 @@ const AuthLayout = ({
                   type="button"
                   onClick={goToRegister}
                   disabled={isTransitioning}
-                  className="text-primary font-semibold hover:text-primary-dark transition-colors focus:outline-none focus:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="text-primary font-semibold hover:text-primary-dark transition-colors cursor-pointer focus:outline-none focus:underline disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   Sign Up
                 </button>
