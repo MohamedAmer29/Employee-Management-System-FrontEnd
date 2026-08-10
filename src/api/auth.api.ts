@@ -74,6 +74,8 @@ export const authApi = {
   resendVerificationOtp: (data: ResendOtpData) =>
     api.post("/auth/resend-verification-otp", data),
   logout: () => api.post("/auth/logout"),
+  logoutAll: () =>
+    api.post<{ message: string; revokedSessions: number }>("/auth/logout-all"),
   refreshToken: () => api.post<RefreshTokenResponse>("/auth/refresh-token"),
   getMe: () => api.get("/auth/me"),
 };

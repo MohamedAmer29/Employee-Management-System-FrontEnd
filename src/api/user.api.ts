@@ -80,6 +80,11 @@ export interface UpdateUserRequest {
   phoneNumber?: string;
 }
 
+export interface ChangePasswordRequest {
+  password: string;
+  confirmPassword: string;
+}
+
 export interface AuditLog {
   id: string;
   userId: number;
@@ -199,6 +204,9 @@ export const userApi = {
   getAdminDashboard: () => api.get<AdminDashboard>("/dashboard/admin"),
   updateUser: (data: UpdateUserRequest) =>
     api.patch<CurrentUser>("/users/me", data),
+  changePassword: (data: ChangePasswordRequest) =>
+    api.patch<CurrentUser>("/users/me/password", data),
+  deactivateAccount: () => api.patch<CurrentUser>("/users/me/deactivate"),
   getNotifications: (params?: NotificationsParams) =>
     api.get<NotificationsResponse>("/notifications", { params }),
   getUnreadNotifications: (params?: NotificationsParams) =>
