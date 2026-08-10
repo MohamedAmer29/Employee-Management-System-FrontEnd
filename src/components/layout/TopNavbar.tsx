@@ -1,12 +1,20 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Menu, Bell, ChevronDown, UserCircle, Settings, LogOut } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  ChevronDown,
+  UserCircle,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import type { RootState } from "@/store/store";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import SearchInput from "@/components/common/SearchInput";
 import Avatar from "@/components/common/Avatar";
 import { useLogout } from "@/features/auth/auth.hooks";
+import { useUnreadNotificationCount } from "@/features/notifications/notifications.hooks";
 import {
   getNavGroupsForRole,
   getNavLabel,
@@ -15,12 +23,13 @@ import {
 
 interface TopNavbarProps {
   onMenuClick: () => void;
-  notificationCount?: number;
 }
 
-const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
+const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
+  const { data: unreadCountData } = useUnreadNotificationCount();
+  const notificationCount = unreadCountData?.unread ?? 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -31,7 +40,9 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
   const { mutate: logout, isPending } = useLogout();
 
   const displayName =
-    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() || user?.username || "User";
+    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+    user?.username ||
+    "User";
   const role = user?.role ?? "Employee";
 
   const navGroups = getNavGroupsForRole(
@@ -144,11 +155,14 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
             transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
           "
         >
-          <Menu className="w-5 h-5" aria-hidden="true" />
+          <Menu className="w-6 h-6" aria-hidden="true" />
         </button>
 
         {/* Search */}
-        <div className="relative flex-1 max-w-sm hidden md:block" ref={searchRef}>
+        <div
+          className="relative flex-1 max-w-sm hidden md:block"
+          ref={searchRef}
+        >
           <SearchInput
             value={query}
             onChange={handleSearchChange}
@@ -207,23 +221,27 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
           {/* Notifications */}
           <button
             type="button"
+            onClick={() => navigate("/notifications")}
             aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
             className="
-              relative flex items-center justify-center h-10 w-10 rounded-xl
+              relative flex items-center justify-center h-10 w-10 lg:ml-2  rounded-xl
               text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5
               transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
             "
           >
-            <Bell className="w-5 h-5" aria-hidden="true" />
+            <Bell
+              className="w-5 h-5 lg:w-6 lg:h-6   text-[#2196F3]/90"
+              aria-hidden="true"
+            />
             {notificationCount > 0 && (
-              <span className="absolute top-2 right-2 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+              <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
                 {notificationCount > 99 ? "99+" : notificationCount}
               </span>
             )}
           </button>
 
           {/* Theme toggle */}
-          <div className="hidden sm:block">
+          <div className=" sm:block">
             <ThemeToggle />
           </div>
 
@@ -241,12 +259,19 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
               "
             >
-              <Avatar firstName={user?.firstName} lastName={user?.lastName} name={displayName} size="md" />
+              <Avatar
+                firstName={user?.firstName}
+                lastName={user?.lastName}
+                name={displayName}
+                size="md"
+              />
               <span className="hidden sm:block text-left leading-tight">
                 <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100 max-w-[120px] truncate">
                   {displayName}
                 </span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">{role}</span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                  {role}
+                </span>
               </span>
               <ChevronDown
                 className={`hidden sm:block w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`}
@@ -268,22 +293,55 @@ const TopNavbar = ({ onMenuClick, notificationCount = 0 }: TopNavbarProps) => {
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                     {displayName}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{user?.username ?? role}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {user?.username ?? role}
+                  </p>
                 </div>
                 <div className="py-1">
-                  <button type="button" role="menuitem" className={menuItemClass} onClick={() => { setMenuOpen(false); navigate("/profile"); }}>
-                    <UserCircle className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={menuItemClass}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate("/profile");
+                    }}
+                  >
+                    <UserCircle
+                      className="w-4 h-4 text-gray-400 dark:text-gray-500"
+                      aria-hidden="true"
+                    />
                     Profile
                   </button>
                   {role === "Admin" && (
-                    <button type="button" role="menuitem" className={menuItemClass} onClick={() => { setMenuOpen(false); navigate("/settings"); }}>
-                      <Settings className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className={menuItemClass}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        navigate("/settings");
+                      }}
+                    >
+                      <Settings
+                        className="w-4 h-4 text-gray-400 dark:text-gray-500"
+                        aria-hidden="true"
+                      />
                       Settings
                     </button>
                   )}
                   <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
-                  <button type="button" role="menuitem" className={menuItemClass} onClick={handleLogout} disabled={isPending}>
-                    <LogOut className="w-4 h-4 text-red-500" aria-hidden="true" />
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={menuItemClass}
+                    onClick={handleLogout}
+                    disabled={isPending}
+                  >
+                    <LogOut
+                      className="w-4 h-4 text-red-500"
+                      aria-hidden="true"
+                    />
                     {isPending ? "Logging out..." : "Logout"}
                   </button>
                 </div>

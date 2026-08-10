@@ -184,14 +184,19 @@ const AuditLogDetails = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
               <InfoRow icon={Boxes} label="Entity" value={log.entity} />
-              <InfoRow icon={Hash} label="Entity ID" value={log.entityId} mono />
               <InfoRow
-                icon={User}
-                label="User ID"
-                value={log.userId}
+                icon={Hash}
+                label="Entity ID"
+                value={log.entityId}
                 mono
               />
-              <InfoRow icon={Globe} label="IP Address" value={log.ipAddress} mono />
+              <InfoRow icon={User} label="User ID" value={log.userId} mono />
+              <InfoRow
+                icon={Globe}
+                label="IP Address"
+                value={log.ipAddress}
+                mono
+              />
               <InfoRow
                 icon={Monitor}
                 label="User Agent"
@@ -230,11 +235,19 @@ const AuditLogDetails = () => {
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <InfoRow icon={Mail} label="Username" value={log.user.username} />
+                <InfoRow
+                  icon={Mail}
+                  label="Username"
+                  value={log.user.username}
+                />
                 <InfoRow
                   icon={MapPin}
                   label="Location"
-                  value={[log.user.country, log.user.city].filter(Boolean).join(", ") || "—"}
+                  value={
+                    [log.user.country, log.user.city]
+                      .filter(Boolean)
+                      .join(", ") || "—"
+                  }
                 />
                 <InfoRow
                   icon={Phone}

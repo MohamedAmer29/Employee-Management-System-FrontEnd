@@ -153,12 +153,66 @@ export interface User {
   emailVerifiedAt: string;
 }
 
+export interface AppNotification {
+  id: string;
+  userId: number;
+  type: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface NotificationsResponse {
+  success: boolean;
+  message: string;
+  data: AppNotification[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface NotificationDetailResponse {
+  success: boolean;
+  message: string;
+  data: AppNotification;
+}
+
+export interface UnreadCountResponse {
+  success: boolean;
+  message: string;
+  data: { unread: number };
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
   getAdminDashboard: () => api.get<AdminDashboard>("/dashboard/admin"),
   updateUser: (data: UpdateUserRequest) =>
     api.patch<CurrentUser>("/users/me", data),
+  getNotifications: (params?: NotificationsParams) =>
+    api.get<NotificationsResponse>("/notifications", { params }),
+  getUnreadNotifications: (params?: NotificationsParams) =>
+    api.get<NotificationsResponse>("/notifications/unread", { params }),
+  getNotificationById: (id: string) =>
+    api.get<NotificationDetailResponse>(`/notifications/${id}`),
+  getUnreadNotificationCount: () =>
+    api.get<UnreadCountResponse>("/notifications/unread-count"),
+  markNotificationAsRead: (id: string) =>
+    api.patch<NotificationDetailResponse>(`/notifications/${id}/read`),
+  markAllNotificationsAsRead: () =>
+    api.patch<NotificationsResponse>("/notifications/read-all"),
+  deleteNotification: (id: string) =>
+    api.delete<NotificationsResponse>(`/notifications/${id}`),
   getAuditLogs: (params?: AuditLogsParams) =>
     api.get<AuditLogsResponse>("/audit-logs", { params }),
   getAuditLogById: (id: string) =>

@@ -179,7 +179,7 @@ const AuditLogs = () => {
               refetch();
               toast.success("Audit logs refreshed successfully");
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-2196F3 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -392,7 +392,7 @@ const AuditLogs = () => {
                           navigate(`/audit-logs/${log.id}`);
                         }
                       }}
-                      className="group cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+                      className="group cursor-pointer hover:bg-[#2196F3]/30 dark:hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">

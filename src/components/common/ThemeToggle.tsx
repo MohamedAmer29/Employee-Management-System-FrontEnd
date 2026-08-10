@@ -1,20 +1,20 @@
-import { Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ThemeToggleProps {
   className?: string;
 }
 
-const ThemeToggle = ({ className = '' }: ThemeToggleProps) => {
+const ThemeToggle = ({ className = "" }: ThemeToggleProps) => {
   const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className={`
         z-30 flex items-center justify-center w-10 h-10 rounded-full
         bg-light text-primary-dark
@@ -26,7 +26,11 @@ const ThemeToggle = ({ className = '' }: ThemeToggleProps) => {
         ${className}
       `}
     >
-      {isDark ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+      {isDark ? (
+        <Sun size={20} aria-hidden="true" />
+      ) : (
+        <Moon size={20} aria-hidden="true" />
+      )}
     </button>
   );
 };

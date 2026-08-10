@@ -172,10 +172,10 @@ const Profile = () => {
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl blur-3xl opacity-50" />
         <div className="relative">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
             Profile
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
             Manage your account details and view your verification status
           </p>
         </div>
@@ -195,7 +195,7 @@ const Profile = () => {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 truncate">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50 truncate">
               {displayName}
             </h2>
             <div className="mt-3 flex flex-wrap items-center gap-2">

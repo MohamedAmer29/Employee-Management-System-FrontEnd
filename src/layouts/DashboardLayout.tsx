@@ -8,7 +8,7 @@ const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-light dark:bg-dark-bg">
+    <div className="flex h-screen overflow-hidden bg-[#E3F2FD] dark:bg-[#0A1C33]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 shrink-0">
         <Sidebar />

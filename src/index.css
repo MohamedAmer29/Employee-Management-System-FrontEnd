@@ -3,21 +3,25 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-dark: #112D4E;
-  --color-primary-dark: #0D47A1;
-  --color-primary: #3F72AF;
-  --color-light: #E3F2FD;
-  --color-dark-bg: #0A1C33;
-  --color-dark-surface: #122B4B;
+  --color-dark: #112d4e;
+  --color-primary-dark: #0d47a1;
+  --color-primary: #3f72af;
+  --color-light: #e3f2fd;
+  --color-dark-bg: #0a1c33;
+  --color-dark-surface: #122b4b;
+  --color-app-bg: #e3f2fd;
+  --color-app-bg-dark: #0a1c33;
 }
 
 :root {
-  --color-dark: #112D4E;
-  --color-primary-dark: #0D47A1;
-  --color-primary: #3F72AF;
-  --color-light: #E3F2FD;
-  --color-dark-bg: #0A1C33;
-  --color-dark-surface: #122B4B;
+  --color-dark: #112d4e;
+  --color-primary-dark: #0d47a1;
+  --color-primary: #3f72af;
+  --color-light: #e3f2fd;
+  --color-dark-bg: #0a1c33;
+  --color-dark-surface: #122b4b;
+  --color-app-bg: #e3f2fd;
+  --color-app-bg-dark: #0a1c33;
   color-scheme: light;
 }
 
@@ -31,17 +35,19 @@ html.dark {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-light);
+  background-color: #e3f2fd;
+  background-image: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   min-height: 100vh;
 }
 
 .dark body {
-  background-color: var(--color-dark-bg);
+  background-color: #0a1c33;
+  background-image: linear-gradient(135deg, #0a1c33 0%, #112d4e 100%);
 }
 
 input:-webkit-autofill,
@@ -91,13 +97,21 @@ input:-webkit-autofill:active {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 .animate-fade-in {
