@@ -156,6 +156,8 @@ export interface User {
   isActive: boolean;
   isEmailVerified: boolean;
   emailVerifiedAt: string;
+  employee?: unknown | null;
+  manager?: unknown | null;
 }
 
 export interface AppNotification {
@@ -198,6 +200,64 @@ export interface UnreadCountResponse {
   data: { unread: number };
 }
 
+export interface Employee {
+  id: number;
+  isActive: boolean;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  role: string;
+  profilePicture: string | null;
+  department: { id: number; name: string } | null;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    username: string;
+    role: string;
+  } | null;
+  createdAt: string;
+}
+
+export interface EmployeeDetail extends Omit<Employee, "user"> {
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    country: string;
+    city: string;
+    phoneNumber: string;
+    nationalId: string;
+    username: string;
+    role: string;
+    tokenVersion: number;
+    isActive: boolean;
+    isEmailVerified: boolean;
+    emailVerifiedAt: string | null;
+  } | null;
+}
+
+export interface UpdateEmployeeRequest {
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  role: "Admin" | "Manager" | "Employee";
+  departmentId?: string;
+  userId?: string;
+  isActive: boolean;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  description: string | null;
+  employees?: Array<{ id: number }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
@@ -226,4 +286,18 @@ export const userApi = {
   getAuditLogById: (id: string) =>
     api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
   getUsers: () => api.get<User[]>("/users"),
+  getDepartments: () => api.get<Department[]>("/department"),
+  getEmployees: () => api.get<Employee[]>("/employees"),
+  createEmployee: (data: UpdateEmployeeRequest) =>
+    api.post<EmployeeDetail>("/employees", data),
+  getEmployeeById: (id: string) => api.get<EmployeeDetail>(`/employees/${id}`),
+  updateEmployee: (id: string, data: Partial<UpdateEmployeeRequest>) =>
+    api.put<EmployeeDetail>(`/employees/${id}`, data),
+  deleteEmployee: (id: string) => api.delete<EmployeeDetail>(`/employees/${id}`),
+  assignDepartment: (id: string, departmentId: string) =>
+    api.post<EmployeeDetail>(`/employees/${id}/assign-department`, {
+      departmentId,
+    }),
+  assignUser: (id: string, userId: string) =>
+    api.post<EmployeeDetail>(`/employees/${id}/assign-user`, { userId }),
 };
