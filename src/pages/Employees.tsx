@@ -29,6 +29,8 @@ import {
 } from "@/features/employees/employees.hooks";
 import type { RootState } from "@/store/store";
 import type { UpdateEmployeeRequest, User } from "@/api/user.api";
+import { getAssetUrl } from "@/utils/assetUrl";
+import { formatDateInUserZone } from "@/utils/formatDate";
 
 const roleBadgeClass: Record<string, string> = {
   Admin: "bg-primary/10 text-primary",
@@ -54,14 +56,8 @@ const initialCreateForm = {
   departmentId: "",
 };
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+const formatDate = (dateString: string) =>
+  formatDateInUserZone(dateString, { dateOnly: true });
 
 const Employees = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -373,6 +369,7 @@ const Employees = () => {
                           firstName={employee.user?.firstName}
                           lastName={employee.user?.lastName}
                           name={employee.fullName}
+                          src={getAssetUrl(employee.profilePicture)}
                           size="md"
                         />
                         <div className="min-w-0">

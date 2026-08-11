@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuditLogs, useUsers } from "@/features/audit/audit.hooks";
 import type { AuditLogsParams } from "@/api/user.api";
+import { formatDateInUserZone } from "@/utils/formatDate";
 
 const actionColors: Record<string, string> = {
   LOGIN:
@@ -32,16 +33,7 @@ const getActionColor = (action: string) =>
   actionColors[action] ||
   "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+const formatDate = (dateString: string) => formatDateInUserZone(dateString);
 
 const AuditLogs = () => {
   const [params, setParams] = useState<AuditLogsParams>({

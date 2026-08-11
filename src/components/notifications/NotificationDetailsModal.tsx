@@ -12,23 +12,15 @@ import {
 } from "lucide-react";
 import { useNotification } from "@/features/notifications/notifications.hooks";
 import { getTypeStyle } from "@/features/notifications/notification.styles";
+import { formatDateInUserZone } from "@/utils/formatDate";
 
 interface NotificationDetailsModalProps {
   notificationId: string | null;
   onClose: () => void;
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-};
+const formatDate = (dateString: string) =>
+  formatDateInUserZone(dateString, { month: "long", includeSeconds: true });
 
 const DetailsRow = ({
   icon: Icon,

@@ -25,17 +25,9 @@ import {
 import { getTypeStyle } from "@/features/notifications/notification.styles";
 import NotificationDetailsModal from "@/components/notifications/NotificationDetailsModal";
 import type { NotificationsParams, AppNotification } from "@/api/user.api";
+import { formatDateInUserZone } from "@/utils/formatDate";
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+const formatDate = (dateString: string) => formatDateInUserZone(dateString);
 
 interface NotificationCardProps {
   notification: AppNotification;

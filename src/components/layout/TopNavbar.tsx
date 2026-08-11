@@ -263,6 +263,7 @@ const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
                 firstName={user?.firstName}
                 lastName={user?.lastName}
                 name={displayName}
+                src={user?.profilePicture as string | null}
                 size="md"
               />
               <span className="hidden sm:block text-left leading-tight">

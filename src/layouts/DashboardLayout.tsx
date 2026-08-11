@@ -6,12 +6,20 @@ import TopNavbar from "@/components/layout/TopNavbar";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#E3F2FD] dark:bg-[#0A1C33]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 shrink-0">
-        <Sidebar />
+      <aside
+        className={`hidden lg:flex lg:flex-col shrink-0 transition-[width] duration-300 ${
+          sidebarCollapsed ? "lg:w-[76px]" : "lg:w-64"
+        }`}
+      >
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed((prev) => !prev)}
+        />
       </aside>
 
       {/* Mobile sidebar drawer */}

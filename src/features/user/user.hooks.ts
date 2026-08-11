@@ -46,3 +46,18 @@ export const useUpdateUser = () => {
     },
   });
 };
+
+export const useUploadMyProfilePicture = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: userApi.uploadMyProfilePicture,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      toast.success("Profile picture updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile picture");
+    },
+  });
+};

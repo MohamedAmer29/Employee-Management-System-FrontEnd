@@ -117,3 +117,20 @@ export const useUpdateEmployee = () => {
     },
   });
 };
+
+export const useUploadEmployeeProfilePicture = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) =>
+      userApi.uploadEmployeeProfilePicture(id, file),
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData(["employees", variables.id], response.data);
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success("Profile picture updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile picture");
+    },
+  });
+};

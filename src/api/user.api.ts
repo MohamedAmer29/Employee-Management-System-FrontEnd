@@ -15,6 +15,7 @@ export interface CurrentUser {
   isActive: boolean;
   isEmailVerified: boolean;
   emailVerifiedAt: string | null;
+  profilePicture: string | null;
   employee: unknown | null;
   [key: string]: unknown;
 }
@@ -300,4 +301,22 @@ export const userApi = {
     }),
   assignUser: (id: string, userId: string) =>
     api.post<EmployeeDetail>(`/employees/${id}/assign-user`, { userId }),
+  uploadEmployeeProfilePicture: (id: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post<EmployeeDetail>(
+      `/employees/${id}/upload-profile-picture`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+  uploadMyProfilePicture: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post<EmployeeDetail>(
+      "/employees/me/profile-picture",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
 };
