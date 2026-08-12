@@ -15,6 +15,8 @@ import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
 import AttendanceDetails from "../pages/AttendanceDetails";
+import Leave from "../pages/Leave";
+import LeaveDetails from "../pages/LeaveDetails";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 
@@ -75,6 +77,8 @@ const AppRoutes = () => {
           <Route path="/departments/:id" element={<DepartmentDetails />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
+          <Route path="/leave" element={<Leave />} />
+          <Route path="/leave/:employeeId" element={<LeaveDetails />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

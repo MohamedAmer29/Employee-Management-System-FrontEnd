@@ -300,6 +300,27 @@ export interface AttendanceRecord {
   isPresent: boolean;
 }
 
+export type LeaveStatus = "pending" | "approved" | "rejected" | "cancelled";
+
+export interface LeaveRequest {
+  id: number;
+  employee: {
+    id: number;
+    isActive: boolean;
+    fullName: string;
+    email: string;
+    phone: string;
+    position: string;
+    role: string;
+    profilePicture: string | null;
+    createdAt: string;
+  };
+  reason: string;
+  startDate: string;
+  endDate: string;
+  status: LeaveStatus;
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
@@ -311,6 +332,13 @@ export const userApi = {
   getAttendance: () => api.get<AttendanceRecord[]>("/attendance"),
   getAttendanceByEmployeeId: (employeeId: string) =>
     api.get<AttendanceRecord[]>(`/attendance/${employeeId}`),
+  getLeaveRequests: () => api.get<LeaveRequest[]>("/leave"),
+  getLeaveByEmployeeId: (employeeId: string) =>
+    api.get<LeaveRequest[]>(`/leave/${employeeId}`),
+  approveLeave: (leaveId: string) =>
+    api.patch<LeaveRequest>(`/leave/${leaveId}/approve`),
+  rejectLeave: (leaveId: string) =>
+    api.patch<LeaveRequest>(`/leave/${leaveId}/reject`),
   updateUser: (data: UpdateUserRequest) =>
     api.patch<CurrentUser>("/users/me", data),
   changePassword: (data: ChangePasswordRequest) =>
