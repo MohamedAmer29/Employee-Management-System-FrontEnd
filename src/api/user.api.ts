@@ -269,10 +269,48 @@ export interface Department {
   updatedAt: string;
 }
 
+export type AttendancePeriod = "today" | "week" | "month" | "year";
+
+export interface AttendanceTrendPoint {
+  date: string;
+  present: number;
+  absent: number;
+}
+
+export interface AttendanceTrendResponse {
+  attendanceTrend: AttendanceTrendPoint[];
+}
+
+export interface AttendanceRecord {
+  id: number;
+  employee: {
+    id: number;
+    isActive: boolean;
+    fullName: string;
+    email: string;
+    phone: string;
+    position: string;
+    role: string;
+    profilePicture: string | null;
+    createdAt: string;
+  };
+  date: string;
+  checkIn: string;
+  checkOut: string;
+  isPresent: boolean;
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
   getAdminDashboard: () => api.get<AdminDashboard>("/dashboard/admin"),
+  getAdminAttendanceTrend: (period: AttendancePeriod) =>
+    api.get<AttendanceTrendResponse>("/dashboard/admin/attendance", {
+      params: { period },
+    }),
+  getAttendance: () => api.get<AttendanceRecord[]>("/attendance"),
+  getAttendanceByEmployeeId: (employeeId: string) =>
+    api.get<AttendanceRecord[]>(`/attendance/${employeeId}`),
   updateUser: (data: UpdateUserRequest) =>
     api.patch<CurrentUser>("/users/me", data),
   changePassword: (data: ChangePasswordRequest) =>

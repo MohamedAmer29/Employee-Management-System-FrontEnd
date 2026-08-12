@@ -13,6 +13,8 @@ import Employees from "../pages/Employees";
 import EmployeeDetails from "../pages/EmployeeDetails";
 import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
+import Attendance from "../pages/Attendance";
+import AttendanceDetails from "../pages/AttendanceDetails";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 
@@ -71,6 +73,8 @@ const AppRoutes = () => {
           <Route path="/employees/:id" element={<EmployeeDetails />} />
           <Route path="/departments" element={<Departments />} />
           <Route path="/departments/:id" element={<DepartmentDetails />} />
+          <Route path="/attendance" element={<Attendance />} />
+          <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>
