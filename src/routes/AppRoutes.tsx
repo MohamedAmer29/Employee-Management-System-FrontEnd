@@ -17,6 +17,7 @@ import Attendance from "../pages/Attendance";
 import AttendanceDetails from "../pages/AttendanceDetails";
 import Leave from "../pages/Leave";
 import LeaveDetails from "../pages/LeaveDetails";
+import Performance from "../pages/Performance";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 
@@ -79,6 +80,7 @@ const AppRoutes = () => {
           <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
           <Route path="/leave" element={<Leave />} />
           <Route path="/leave/:employeeId" element={<LeaveDetails />} />
+          <Route path="/performance" element={<Performance />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

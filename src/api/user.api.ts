@@ -34,6 +34,11 @@ export interface DepartmentEmployee {
   employeeCount: number;
 }
 
+export interface PerformanceDistributionItem {
+  rating: number;
+  count: number;
+}
+
 export interface AdminDashboard {
   employees: {
     total: number;
@@ -64,7 +69,7 @@ export interface AdminDashboard {
     averageRating: number;
     totalReviews: number;
     reviewsThisMonth: number;
-    performanceDistribution: unknown[];
+    performanceDistribution: PerformanceDistributionItem[];
   };
   notifications: {
     total: number;
@@ -300,6 +305,39 @@ export interface AttendanceRecord {
   isPresent: boolean;
 }
 
+export interface PerformanceReview {
+  id: number;
+  employee: {
+    id: number;
+    isActive: boolean;
+    fullName: string;
+    email: string;
+    phone: string;
+    position: string;
+    role: string;
+    profilePicture: string | null;
+    createdAt: string;
+  };
+  reviewer: string;
+  feedback: string;
+  rating: number;
+  reviewDate: string;
+}
+
+export interface UpdatePerformanceRequest {
+  employeeId: string;
+  feedback: string;
+  rating: number;
+  reviewDate: string;
+}
+
+export interface CreatePerformanceRequest {
+  employeeId: string;
+  feedback: string;
+  rating: number;
+  reviewDate: string;
+}
+
 export type LeaveStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 export interface LeaveRequest {
@@ -339,6 +377,16 @@ export const userApi = {
     api.patch<LeaveRequest>(`/leave/${leaveId}/approve`),
   rejectLeave: (leaveId: string) =>
     api.patch<LeaveRequest>(`/leave/${leaveId}/reject`),
+  getPerformanceReviews: () =>
+    api.get<PerformanceReview[]>("/performance"),
+  createPerformanceReview: (data: CreatePerformanceRequest) =>
+    api.post<PerformanceReview>("/performance", data),
+  updatePerformanceReview: (
+    performanceId: string,
+    data: UpdatePerformanceRequest,
+  ) => api.patch<PerformanceReview>(`/performance/${performanceId}`, data),
+  deletePerformanceReview: (performanceId: string) =>
+    api.delete<PerformanceReview>(`/performance/${performanceId}`),
   updateUser: (data: UpdateUserRequest) =>
     api.patch<CurrentUser>("/users/me", data),
   changePassword: (data: ChangePasswordRequest) =>

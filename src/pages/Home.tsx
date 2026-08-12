@@ -191,13 +191,10 @@ const Home = () => {
 
   const performanceChartItems = useMemo(() => {
     if (!dashboard) return [];
-    return dashboard.performance.performanceDistribution.map((item) => {
-      const typedItem = item as { label?: string; value?: number };
-      return {
-        label: typedItem.label ?? "—",
-        value: typedItem.value ?? 0,
-      };
-    });
+    return dashboard.performance.performanceDistribution.map((item) => ({
+      label: `${item.rating} stars`,
+      value: item.count,
+    }));
   }, [dashboard]);
 
   const statCards = [

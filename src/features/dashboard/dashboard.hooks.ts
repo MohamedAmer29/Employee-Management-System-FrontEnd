@@ -11,7 +11,8 @@ export const useAdminDashboard = () => {
     queryFn: () =>
       userApi.getAdminDashboard().then((response) => response.data),
     enabled: !!accessToken,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 };
