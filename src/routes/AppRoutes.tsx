@@ -11,6 +11,8 @@ import Notifications from "../pages/Notifications";
 import Settings from "../pages/Settings";
 import Employees from "../pages/Employees";
 import EmployeeDetails from "../pages/EmployeeDetails";
+import Departments from "../pages/Departments";
+import DepartmentDetails from "../pages/DepartmentDetails";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 
@@ -67,6 +69,8 @@ const AppRoutes = () => {
           <Route path="/settings" element={<Settings />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/employees/:id" element={<EmployeeDetails />} />
+          <Route path="/departments" element={<Departments />} />
+          <Route path="/departments/:id" element={<DepartmentDetails />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

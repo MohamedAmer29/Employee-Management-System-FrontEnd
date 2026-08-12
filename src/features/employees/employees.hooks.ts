@@ -28,6 +28,84 @@ export const useDepartments = (enabled = true) => {
   });
 };
 
+export const useDepartment = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["department", id],
+    queryFn: async () => {
+      const response = await userApi.getDepartments();
+      const department = response.data.find((dept) => String(dept.id) === id);
+      if (!department) throw new Error("Department not found");
+      return department;
+    },
+    enabled: Boolean(id),
+  });
+};
+
+export const useCreateDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (name: string) => userApi.createDepartment(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      toast.success("Department created successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create department");
+    },
+  });
+};
+
+export const useDeleteDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => userApi.deleteDepartment(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["department"] });
+      toast.success("Department deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete department");
+    },
+  });
+};
+
+export const useAssignEmployeesToDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, employeeIds }: { id: string; employeeIds: string[] }) =>
+      userApi.assignEmployeesToDepartment(id, employeeIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["department"] });
+      toast.success("Employees assigned to department successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to assign employees to department");
+    },
+  });
+};
+
+export const useUpdateDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      userApi.updateDepartment(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: ["department"] });
+      toast.success("Department updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update department");
+    },
+  });
+};
+
 export const useUsers = (enabled = true) => {
   return useQuery({
     queryKey: ["users"],

@@ -254,7 +254,17 @@ export interface Department {
   id: string;
   name: string;
   description: string | null;
-  employees?: Array<{ id: number }>;
+  employees?: Array<{
+    id: number;
+    isActive: boolean;
+    fullName: string;
+    email: string;
+    phone: string;
+    position: string;
+    role: string;
+    profilePicture: string | null;
+    createdAt: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -288,6 +298,16 @@ export const userApi = {
     api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
   getUsers: () => api.get<User[]>("/users"),
   getDepartments: () => api.get<Department[]>("/department"),
+  createDepartment: (name: string) =>
+    api.post<Department>("/department", { name }),
+  updateDepartment: (id: string, name: string) =>
+    api.put<Department>(`/department/${id}`, { name }),
+  deleteDepartment: (id: string) =>
+    api.delete<Department>(`/department/${id}`),
+  assignEmployeesToDepartment: (id: string, employeeIds: string[]) =>
+    api.post<Department>(`/department/${id}/assign-employees`, {
+      employeeIds,
+    }),
   getEmployees: () => api.get<Employee[]>("/employees"),
   createEmployee: (data: UpdateEmployeeRequest) =>
     api.post<EmployeeDetail>("/employees", data),
