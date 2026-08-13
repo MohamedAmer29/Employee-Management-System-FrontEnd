@@ -5,7 +5,6 @@ import {
   RefreshCw,
   Clock,
   Hash,
-  User,
   CheckCircle2,
   Circle,
   type LucideIcon,
@@ -162,12 +161,6 @@ const NotificationDetailsModal = ({
                 icon={Hash}
                 label="Notification ID"
                 value={notification.id}
-                mono
-              />
-              <DetailsRow
-                icon={User}
-                label="User ID"
-                value={notification.userId}
                 mono
               />
             </div>

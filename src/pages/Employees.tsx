@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import {
   Search,
   RefreshCw,
@@ -45,7 +46,7 @@ const formatUserOption = (user: User) => {
     : user.manager
       ? " - Assigned to manager"
       : "";
-  return `${fullName} (#${user.id}) - ${user.role} - ${
+  return `${fullName} - ${user.role} - ${
     user.isActive ? "Active" : "Inactive"
   } - ${user.isEmailVerified ? "Email verified" : "Email not verified"}${assignedLabel}`;
 };
@@ -107,12 +108,38 @@ const Employees = () => {
     if (!selectedUser) return;
 
     const fullName =
-      `${selectedUser.firstName} ${selectedUser.lastName}`.trim();
+      `${selectedUser.firstName} ${selectedUser.lastName}`.trim() ||
+      selectedUser.username;
+    const email = (selectedUser.username || "").trim();
+    const phone = (selectedUser.phoneNumber || "").replace(/[\s-]/g, "");
+    const position = createForm.position.trim();
+
+    if (fullName.length < 2) {
+      toast.error("Full name must be at least 2 characters.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error(
+        "The selected user has an invalid email address; it must be a valid email.",
+      );
+      return;
+    }
+    if (!/^(?:\+?20)?01[0-9]{9}$/.test(phone)) {
+      toast.error(
+        "The selected user's phone must be a valid Egyptian number (e.g. 01xxxxxxxxx or +20 1xxxxxxxxx).",
+      );
+      return;
+    }
+    if (position.length < 2) {
+      toast.error("Position must be at least 2 characters.");
+      return;
+    }
+
     const data: UpdateEmployeeRequest = {
       fullName,
-      email: selectedUser.username,
+      email,
       phone: selectedUser.phoneNumber,
-      position: createForm.position.trim(),
+      position,
       role: selectedUser.role as "Admin" | "Manager" | "Employee",
       userId: String(selectedUser.id),
       isActive: selectedUser.isActive,
@@ -120,7 +147,6 @@ const Employees = () => {
     if (createForm.departmentId.trim()) {
       data.departmentId = createForm.departmentId.trim();
     }
-    console.log(data);
     try {
       await createEmployee.mutateAsync(data);
       setIsAddModalOpen(false);
@@ -239,14 +265,6 @@ const Employees = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <RefreshCw className="w-4 h-4" aria-hidden="true" />
-            Refresh
-          </button>
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}

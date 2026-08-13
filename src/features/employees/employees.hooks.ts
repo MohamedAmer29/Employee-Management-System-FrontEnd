@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
 import { userApi } from "../../api/user.api";
 import { toast } from "react-toastify";
+import { setUser } from "../../store/slices/authSlice";
+import type { RootState } from "../../store/store";
 
 export const useEmployees = () => {
   return useQuery({
@@ -198,6 +201,8 @@ export const useUpdateEmployee = () => {
 
 export const useUploadEmployeeProfilePicture = () => {
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
 
   return useMutation({
     mutationFn: ({ id, file }: { id: string; file: File }) =>
@@ -205,6 +210,20 @@ export const useUploadEmployeeProfilePicture = () => {
     onSuccess: (response, variables) => {
       queryClient.setQueryData(["employees", variables.id], response.data);
       queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      const uploadedUserId = response.data?.user?.id;
+      if (
+        currentUser &&
+        uploadedUserId != null &&
+        String(currentUser.id) === String(uploadedUserId)
+      ) {
+        dispatch(
+          setUser({
+            ...currentUser,
+            profilePicture: response.data.profilePicture,
+          }),
+        );
+      }
       toast.success("Profile picture updated successfully!");
     },
     onError: (error) => {

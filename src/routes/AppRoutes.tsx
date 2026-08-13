@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Login from "../pages/auth/Login";
@@ -20,6 +21,10 @@ import LeaveDetails from "../pages/LeaveDetails";
 import Performance from "../pages/Performance";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
+
+// Lazy-loaded routes to reduce the initial bundle size
+const UsersPage = lazy(() => import("../pages/Users"));
+const UserDetails = lazy(() => import("../pages/UserDetails"));
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useSelector(
@@ -78,6 +83,22 @@ const AppRoutes = () => {
           <Route path="/departments/:id" element={<DepartmentDetails />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
+          <Route
+            path="/users"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <UsersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/users/:id"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <UserDetails />
+              </Suspense>
+            }
+          />
           <Route path="/leave" element={<Leave />} />
           <Route path="/leave/:employeeId" element={<LeaveDetails />} />
           <Route path="/performance" element={<Performance />} />

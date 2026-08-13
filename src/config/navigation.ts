@@ -32,6 +32,7 @@ export const navigationGroups: NavGroup[] = [
     title: "Main",
     items: [
       { label: "Dashboard", path: "/home", icon: LayoutDashboard },
+      { label: "Users", path: "/users", icon: User, roles: ["Admin"] },
       {
         label: "Employees",
         path: "/employees",
@@ -81,7 +82,12 @@ export const navigationGroups: NavGroup[] = [
         roles: ["Admin"],
       },
       { label: "Profile", path: "/profile", icon: User },
-      { label: "Settings", path: "/settings", icon: Settings, roles: ["Admin"] },
+      {
+        label: "Settings",
+        path: "/settings",
+        icon: Settings,
+        roles: ["Admin"],
+      },
     ],
   },
 ];

@@ -68,7 +68,10 @@ const InfoItem = ({ icon: Icon, label, value, onClick }: InfoItemProps) => {
         {onClick ? (
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-dark-input px-2.5 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:border-blue-400 dark:group-hover:border-blue-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors cursor-pointer">
             {value ?? "—"}
-            <Pencil className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+            <Pencil
+              className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity"
+              aria-hidden="true"
+            />
           </span>
         ) : (
           <p className="text-base font-semibold text-gray-900 dark:text-gray-100 break-all leading-tight">
@@ -103,7 +106,7 @@ const formatUserOption = (user: {
     : user.manager
       ? " - Assigned to manager"
       : "";
-  return `${fullName} (#${user.id}) - ${user.role} - ${
+  return `${fullName} - ${user.role} - ${
     user.isActive ? "Active" : "Inactive"
   } - ${user.isEmailVerified ? "Email verified" : "Email not verified"}${assignedLabel}`;
 };
@@ -187,11 +190,7 @@ const EmployeeDetails = () => {
     }
   };
   const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
     position: "",
-    role: "Employee",
     departmentId: "",
     userId: "",
     isActive: true,
@@ -200,11 +199,7 @@ const EmployeeDetails = () => {
   const openEditModal = () => {
     if (!employee) return;
     setForm({
-      fullName: employee.fullName,
-      email: employee.email,
-      phone: employee.phone,
       position: employee.position,
-      role: employee.role ?? "Employee",
       departmentId: employee.department?.id
         ? String(employee.department.id)
         : "",
@@ -243,11 +238,7 @@ const EmployeeDetails = () => {
     if (!employee || !id) return;
 
     const data: Parameters<typeof updateEmployee.mutate>[0]["data"] = {
-      fullName: form.fullName.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
       position: form.position.trim(),
-      role: form.role as "Admin" | "Manager" | "Employee",
       isActive: form.isActive,
     };
 
@@ -408,7 +399,10 @@ const EmployeeDetails = () => {
                 className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {uploadProfilePicture.isPending ? (
-                  <Loader2 className="w-6 h-6 text-white animate-spin" aria-hidden="true" />
+                  <Loader2
+                    className="w-6 h-6 text-white animate-spin"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <Camera className="w-6 h-6 text-white" aria-hidden="true" />
                 )}
@@ -638,56 +632,6 @@ const EmployeeDetails = () => {
 
             {/* Body */}
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="edit-fullName"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                >
-                  Full name
-                </label>
-                <input
-                  id="edit-fullName"
-                  type="text"
-                  value={form.fullName}
-                  onChange={(e) =>
-                    setForm({ ...form, fullName: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="edit-email"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                >
-                  Email
-                </label>
-                <input
-                  id="edit-email"
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="edit-phone"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                >
-                  Phone
-                </label>
-                <input
-                  id="edit-phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  required
-                />
-              </div>
               <div>
                 <label
                   htmlFor="edit-position"
@@ -705,24 +649,6 @@ const EmployeeDetails = () => {
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   required
                 />
-              </div>
-              <div>
-                <label
-                  htmlFor="edit-role"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                >
-                  Role
-                </label>
-                <select
-                  id="edit-role"
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Employee">Employee</option>
-                </select>
               </div>
               <div>
                 <label
@@ -768,7 +694,7 @@ const EmployeeDetails = () => {
                   ))}
                 </select>
               </div>
-              <div className="sm:col-span-2 flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5">
+              {/* <div className="sm:col-span-2 flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5">
                 <div>
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     Active status
@@ -795,7 +721,7 @@ const EmployeeDetails = () => {
                     }`}
                   />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Footer */}

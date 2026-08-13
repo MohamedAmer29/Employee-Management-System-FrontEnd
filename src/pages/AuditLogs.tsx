@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,8 +13,11 @@ import {
   Download,
   X,
   Search,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 import { useAuditLogs, useUsers } from "@/features/audit/audit.hooks";
+import { useAdminLogoutUser } from "@/features/users/users.hooks";
 import type { AuditLogsParams } from "@/api/user.api";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
@@ -46,10 +50,32 @@ const AuditLogs = () => {
   const [userIdFilter, setUserIdFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [limit, setLimit] = useState(20);
+  const [logoutUser, setLogoutUser] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const adminLogoutUser = useAdminLogoutUser();
 
   const { data, isLoading, isError, refetch } = useAuditLogs(params);
   const { data: users } = useUsers();
+
+  const handleLogoutUser = async () => {
+    if (!logoutUser) return;
+    try {
+      await adminLogoutUser.mutateAsync(logoutUser.id);
+      setLogoutUser(null);
+      toast.success("User logged out from all devices successfully!");
+      refetch();
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "all",
+      });
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
 
   const handleFilter = () => {
     setParams((prev) => ({
@@ -153,7 +179,7 @@ const AuditLogs = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -164,14 +190,14 @@ const AuditLogs = () => {
             Track and monitor all system activities
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => {
               refetch();
               toast.success("Audit logs refreshed successfully");
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-2196F3 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -179,7 +205,7 @@ const AuditLogs = () => {
           <button
             type="button"
             onClick={handleExport}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer"
           >
             <Download className="w-4 h-4" />
             Export
@@ -344,29 +370,29 @@ const AuditLogs = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto max-w-full">
+              <table className="w-full min-w-0">
                 <thead className="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Timestamp
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Action
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Entity
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
                       IP Address
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                    <th className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
                       <span className="sr-only">Details</span>
                     </th>
                   </tr>
@@ -386,7 +412,7 @@ const AuditLogs = () => {
                       }}
                       className="group cursor-pointer hover:bg-[#2196F3]/30 dark:hover:bg-white/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-900 dark:text-gray-100">
@@ -394,7 +420,7 @@ const AuditLogs = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${getActionColor(
                             log.action,
@@ -403,7 +429,7 @@ const AuditLogs = () => {
                           {log.action}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-gray-400" />
@@ -420,26 +446,43 @@ const AuditLogs = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {log.entity}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
                         <span className="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate block">
                           {log.description}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden lg:table-cell">
                         <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">
                           {log.ipAddress || "—"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <ChevronRight
-                          className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors inline-block"
-                          aria-hidden="true"
-                        />
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right">
+                        {log.action === "LOGIN" && log.user ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLogoutUser({
+                                id: log.user.id,
+                                name: `${log.user.firstName} ${log.user.lastName}`,
+                              });
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                          >
+                            <LogOut className="w-3.5 h-3.5" />
+                            Logout
+                          </button>
+                        ) : (
+                          <ChevronRight
+                            className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors inline-block"
+                            aria-hidden="true"
+                          />
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -448,7 +491,7 @@ const AuditLogs = () => {
             </div>
 
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {searchQuery
@@ -503,6 +546,67 @@ const AuditLogs = () => {
           </>
         )}
       </div>
+
+      {logoutUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Logout user"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!adminLogoutUser.isPending) setLogoutUser(null);
+            }}
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 mb-5">
+                <LogOut className="w-8 h-8" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">
+                Log out this user?
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                This will log{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {logoutUser.name}
+                </span>{" "}
+                out of all devices and revoke all active sessions.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setLogoutUser(null)}
+                  disabled={adminLogoutUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogoutUser}
+                  disabled={adminLogoutUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                >
+                  {adminLogoutUser.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Logging out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

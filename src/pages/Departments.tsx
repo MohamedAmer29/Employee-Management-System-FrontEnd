@@ -139,15 +139,6 @@ const Departments = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} aria-hidden="true" />
-            Refresh
-          </button>
-          <button
-            type="button"
             onClick={() => {
               setNewDepartmentName("");
               setIsAddOpen(true);

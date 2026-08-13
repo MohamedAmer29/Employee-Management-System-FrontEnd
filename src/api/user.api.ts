@@ -86,9 +86,25 @@ export interface UpdateUserRequest {
   phoneNumber?: string;
 }
 
+export interface UpdateUserByIdRequest extends UpdateUserRequest {
+  role?: UserRole;
+}
+
 export interface ChangePasswordRequest {
   password: string;
   confirmPassword: string;
+}
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  phoneNumber: string;
+  nationalId: string;
+  username: string;
+  password: string;
+  role: UserRole;
 }
 
 export interface AuditLog {
@@ -148,6 +164,17 @@ export interface AuditLogDetailResponse {
   data: AuditLog;
 }
 
+export interface UserEmployee {
+  id: number;
+  isActive: boolean;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  role: string;
+  createdAt: string;
+}
+
 export interface User {
   id: number;
   firstName: string;
@@ -161,8 +188,9 @@ export interface User {
   tokenVersion: number;
   isActive: boolean;
   isEmailVerified: boolean;
-  emailVerifiedAt: string;
-  employee?: unknown | null;
+  emailVerifiedAt: string | null;
+  profilePicture?: string | null;
+  employee?: UserEmployee | null;
   manager?: unknown | null;
 }
 
@@ -411,6 +439,22 @@ export const userApi = {
   getAuditLogById: (id: string) =>
     api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
   getUsers: () => api.get<User[]>("/users"),
+  createUser: (data: CreateUserRequest) => api.post<User>("/users", data),
+  getUserById: (id: string | number) => api.get<User>(`/users/${id}`),
+  updateUserById: (id: string | number, data: UpdateUserByIdRequest) =>
+    api.patch<User>(`/users/${id}`, data),
+  resetUserPassword: (
+    id: string | number,
+    data: ChangePasswordRequest,
+  ) => api.patch<User>(`/users/${id}/password`, data),
+  deleteUser: (id: string | number) =>
+    api.delete<User>(`/users/${id}`),
+  activateUser: (id: string | number) =>
+    api.patch<User>(`/users/${id}/activate`),
+  deactivateUser: (id: string | number) =>
+    api.patch<User>(`/users/${id}/deactivate`),
+  adminLogoutUser: (id: string | number) =>
+    api.post(`/admin/users/${id}/logout`),
   getDepartments: () => api.get<Department[]>("/department"),
   createDepartment: (name: string) =>
     api.post<Department>("/department", { name }),

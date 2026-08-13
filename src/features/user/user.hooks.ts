@@ -49,11 +49,21 @@ export const useUpdateUser = () => {
 
 export const useUploadMyProfilePicture = () => {
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   return useMutation({
     mutationFn: userApi.uploadMyProfilePicture,
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      if (user) {
+        dispatch(
+          setUser({
+            ...user,
+            profilePicture: response.data.profilePicture,
+          }),
+        );
+      }
       toast.success("Profile picture updated successfully!");
     },
     onError: (error) => {

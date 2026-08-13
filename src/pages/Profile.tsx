@@ -6,7 +6,6 @@ import {
   IdCard,
   BadgeCheck,
   ShieldCheck,
-  Fingerprint,
   CalendarClock,
   RefreshCw,
   UserRound,
@@ -345,7 +344,6 @@ const Profile = () => {
             onEdit={() => handleEdit("phoneNumber", user.phoneNumber || "")}
           />
           <InfoItem icon={IdCard} label="National ID" value={user.nationalId} />
-          <InfoItem icon={Fingerprint} label="User ID" value={user.id} />
           <InfoItem icon={ShieldCheck} label="Role" value={role} />
           <InfoItem
             icon={RefreshCw}

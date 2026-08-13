@@ -1,33 +1,25 @@
-const STORAGE_KEY = "ems_access_token";
+import {
+  queryClient,
+  ACCESS_TOKEN_KEY,
+  ACCESS_TOKEN_TTL_MS,
+} from "../api/queryClient";
 
-let accessToken: string | null = null;
-
-const readStoredToken = (): string | null => {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-};
-
-// Initialize from storage at module load so a page refresh can reuse a still-valid token.
-accessToken = readStoredToken();
+// Back the token with TanStack Query instead of localStorage so it's not
+// durably persisted, with a 15-minute TTL enforced via cache defaults.
+queryClient.setQueryDefaults(ACCESS_TOKEN_KEY, {
+  staleTime: ACCESS_TOKEN_TTL_MS,
+  gcTime: ACCESS_TOKEN_TTL_MS,
+});
 
 export const setAuthToken = (token: string | null) => {
-  accessToken = token;
-  try {
-    if (token) {
-      window.localStorage.setItem(STORAGE_KEY, token);
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-  } catch {
-    // Storage unavailable (private mode etc.); the in-memory token still works.
+  if (!token) {
+    queryClient.removeQueries({ queryKey: ACCESS_TOKEN_KEY });
+    return;
   }
+  queryClient.setQueryData(ACCESS_TOKEN_KEY, token);
 };
 
-export const getAuthToken = (): string | null => accessToken;
+export const getAuthToken = (): string | null =>
+  (queryClient.getQueryData(ACCESS_TOKEN_KEY) as string | null) ?? null;
 
-export const clearAuthToken = () => {
-  setAuthToken(null);
-};
+export const clearAuthToken = () => setAuthToken(null);

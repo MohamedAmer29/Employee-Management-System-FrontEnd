@@ -28,7 +28,7 @@ const DashboardLayout = () => {
       </MobileSidebar>
 
       {/* Main column */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
         <TopNavbar onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 px-4 sm:px-6 lg:px-8 pb-8 mt-4">
           <Outlet />
