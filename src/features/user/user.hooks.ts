@@ -39,6 +39,10 @@ export const useUpdateUser = () => {
     onSuccess: (data) => {
       dispatch(setUser(data.data));
       queryClient.setQueryData(["currentUser"], data.data);
+      // The profile fields mirror the linked employee, so drop the employee
+      // list/detail and user caches to avoid serving stale data on those pages.
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("Profile updated successfully!");
     },
     onError: (error) => {
@@ -56,6 +60,10 @@ export const useUploadMyProfilePicture = () => {
     mutationFn: userApi.uploadMyProfilePicture,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
       if (user) {
         dispatch(
           setUser({

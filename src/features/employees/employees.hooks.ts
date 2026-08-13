@@ -210,6 +210,8 @@ export const useUploadEmployeeProfilePicture = () => {
     onSuccess: (response, variables) => {
       queryClient.setQueryData(["employees", variables.id], response.data);
       queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       const uploadedUserId = response.data?.user?.id;
       if (

@@ -27,7 +27,6 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Power,
   UserCheck,
   UserX,
   LogOut,
@@ -42,8 +41,8 @@ import {
   useActivateUser,
   useDeactivateUser,
   useAdminLogoutUser,
+  useUploadUserProfilePicture,
 } from "@/features/users/users.hooks";
-import { useUploadEmployeeProfilePicture } from "@/features/employees/employees.hooks";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
@@ -105,7 +104,7 @@ const UserDetails = () => {
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
   const adminLogoutUser = useAdminLogoutUser();
-  const uploadProfilePicture = useUploadEmployeeProfilePicture();
+  const uploadProfilePicture = useUploadUserProfilePicture();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -250,10 +249,10 @@ const UserDetails = () => {
     event: ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
-    if (!file || !user?.employee) return;
+    if (!file || !user) return;
     try {
       await uploadProfilePicture.mutateAsync({
-        id: String(user.employee.id),
+        id: String(user.id),
         file,
       });
       refetch();
@@ -358,35 +357,14 @@ const UserDetails = () => {
         <div className="flex flex-col items-center text-center gap-5">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark rounded-full blur-2xl opacity-30 scale-110" />
-            {user.employee ? (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadProfilePicture.isPending}
-                title="Update profile picture"
-                aria-label="Update profile picture"
-                className="group relative rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <Avatar
-                  firstName={user.firstName}
-                  lastName={user.lastName}
-                  name={displayName}
-                  src={profileImageUrl}
-                  size="xl"
-                  className="relative rounded-full p-1.5 bg-gradient-to-br from-primary to-primary-dark shadow-xl ring-2 ring-white/60 dark:ring-dark-surface"
-                />
-                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {uploadProfilePicture.isPending ? (
-                    <Loader2
-                      className="w-6 h-6 text-white animate-spin"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Camera className="w-6 h-6 text-white" aria-hidden="true" />
-                  )}
-                </span>
-              </button>
-            ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadProfilePicture.isPending}
+              title="Update profile picture"
+              aria-label="Update profile picture"
+              className="group relative rounded-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               <Avatar
                 firstName={user.firstName}
                 lastName={user.lastName}
@@ -395,7 +373,17 @@ const UserDetails = () => {
                 size="xl"
                 className="relative rounded-full p-1.5 bg-gradient-to-br from-primary to-primary-dark shadow-xl ring-2 ring-white/60 dark:ring-dark-surface"
               />
-            )}
+              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                {uploadProfilePicture.isPending ? (
+                  <Loader2
+                    className="w-6 h-6 text-white animate-spin"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" aria-hidden="true" />
+                )}
+              </span>
+            </button>
             {profileImageUrl && (
               <button
                 type="button"

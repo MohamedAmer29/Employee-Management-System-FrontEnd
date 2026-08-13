@@ -10,6 +10,7 @@ import {
   ScrollText,
   User,
   Settings,
+  UserCheck,
 } from "lucide-react";
 
 export type UserRole = "Admin" | "Manager" | "Employee";
@@ -38,6 +39,12 @@ export const navigationGroups: NavGroup[] = [
         path: "/employees",
         icon: Users,
         roles: ["Admin", "Manager"],
+      },
+      {
+        label: "Managers",
+        path: "/managers",
+        icon: UserCheck,
+        roles: ["Admin"],
       },
       {
         label: "Departments",

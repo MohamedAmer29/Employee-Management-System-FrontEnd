@@ -387,6 +387,78 @@ export interface LeaveRequest {
   status: LeaveStatus;
 }
 
+export interface ManagerEmployee {
+  id: number;
+  isActive: boolean;
+  fullName: string;
+  email: string;
+  phone: string;
+  position: string;
+  role: string;
+  department: { id: number; name: string } | null;
+  createdAt: string;
+}
+
+export interface Manager {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  country: string;
+  city: string;
+  phoneNumber: string;
+  nationalId: string;
+  profilePicture: string | null;
+  role: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  emailVerifiedAt: string | null;
+  createdAt: string;
+  employee: ManagerEmployee | null;
+}
+
+export interface ManagersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  departmentId?: string;
+}
+
+export interface UpdateManagerRequest {
+  firstName?: string;
+  lastName?: string;
+  country?: string;
+  city?: string;
+  phoneNumber?: string;
+  nationalId?: string;
+  position?: string;
+  departmentId?: string;
+}
+
+export interface CreateManagerRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  country: string;
+  city: string;
+  phoneNumber: string;
+  nationalId: string;
+  position: string;
+  departmentId: string;
+}
+
+export interface ManagersResponse {
+  data: Manager[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
@@ -438,6 +510,22 @@ export const userApi = {
     api.get<AuditLogsResponse>("/audit-logs", { params }),
   getAuditLogById: (id: string) =>
     api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
+  getAdminManagers: (params?: ManagersParams) =>
+    api.get<ManagersResponse>("/admin/managers", { params }),
+  getAdminManagerById: (id: string | number) =>
+    api.get<Manager>(`/admin/managers/${id}`),
+  updateAdminManager: (id: string | number, data: UpdateManagerRequest) =>
+    api.patch<Manager>(`/admin/managers/${id}`, data),
+  deleteAdminManager: (id: string | number) =>
+    api.delete<{ message: string }>(`/admin/managers/${id}`),
+  assignManagerToDepartment: (id: string | number, departmentId: string) =>
+    api.patch<Manager>(`/admin/managers/${id}/department`, { departmentId }),
+  activateManager: (id: string | number) =>
+    api.patch<Manager>(`/admin/managers/${id}/activate`),
+  deactivateManager: (id: string | number) =>
+    api.patch<Manager>(`/admin/managers/${id}/deactivate`),
+  createAdminManager: (data: CreateManagerRequest) =>
+    api.post<Manager>("/admin/managers", data),
   getUsers: () => api.get<User[]>("/users"),
   createUser: (data: CreateUserRequest) => api.post<User>("/users", data),
   getUserById: (id: string | number) => api.get<User>(`/users/${id}`),
@@ -479,6 +567,13 @@ export const userApi = {
     }),
   assignUser: (id: string, userId: string) =>
     api.post<EmployeeDetail>(`/employees/${id}/assign-user`, { userId }),
+  uploadUserProfilePicture: (id: string | number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post<CurrentUser>(`/users/${id}/profile-picture`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
   uploadEmployeeProfilePicture: (id: string, file: File) => {
     const formData = new FormData();
     formData.append("file", file);

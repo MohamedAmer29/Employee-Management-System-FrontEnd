@@ -25,6 +25,8 @@ import FullPageLoader from "../components/common/FullPageLoader";
 // Lazy-loaded routes to reduce the initial bundle size
 const UsersPage = lazy(() => import("../pages/Users"));
 const UserDetails = lazy(() => import("../pages/UserDetails"));
+const ManagersPage = lazy(() => import("../pages/Managers"));
+const ManagerDetails = lazy(() => import("../pages/ManagerDetails"));
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useSelector(
@@ -81,6 +83,22 @@ const AppRoutes = () => {
           <Route path="/employees/:id" element={<EmployeeDetails />} />
           <Route path="/departments" element={<Departments />} />
           <Route path="/departments/:id" element={<DepartmentDetails />} />
+          <Route
+            path="/managers"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <ManagersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/managers/:id"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <ManagerDetails />
+              </Suspense>
+            }
+          />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
           <Route
