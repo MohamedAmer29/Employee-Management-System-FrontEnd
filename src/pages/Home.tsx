@@ -22,6 +22,8 @@ import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/store/store";
 import { useCurrentUser } from "@/features/user/user.hooks";
 import { useAdminDashboard } from "@/features/dashboard/dashboard.hooks";
+import EmployeeHome from "@/pages/EmployeeHome";
+import FullPageLoader from "@/components/common/FullPageLoader";
 import StatCard from "@/components/dashboard/StatCard";
 import { DoughnutChartCard, BarChartCard } from "@/components/dashboard/charts";
 import type { RecentActivity } from "@/api/user.api";
@@ -116,7 +118,7 @@ const Panel = ({
   </section>
 );
 
-const Home = () => {
+const AdminHome = () => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUserQuery = useCurrentUser();
@@ -499,6 +501,23 @@ const Home = () => {
       </div>
     </div>
   );
+};
+
+const Home = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  // The user record is only available after session restore completes.
+  // Rendering either dashboard before that could fire a request for the
+  // wrong endpoint (e.g. an employee hitting /dashboard/admin).
+  if (!user) {
+    return <FullPageLoader />;
+  }
+
+  if (user.role === "Employee") {
+    return <EmployeeHome />;
+  }
+
+  return <AdminHome />;
 };
 
 export default Home;

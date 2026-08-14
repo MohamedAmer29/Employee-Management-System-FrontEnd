@@ -16,3 +16,17 @@ export const useAdminDashboard = () => {
     refetchOnWindowFocus: true,
   });
 };
+
+export const useEmployeeDashboard = () => {
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  return useQuery({
+    queryKey: ["dashboard", "employee"],
+    queryFn: () =>
+      userApi.getEmployeeDashboard().then((response) => response.data),
+    enabled: !!accessToken,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+};

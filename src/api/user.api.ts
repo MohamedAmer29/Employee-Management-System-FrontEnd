@@ -78,6 +78,55 @@ export interface AdminDashboard {
   recentActivities: RecentActivity[];
 }
 
+export interface EmployeeDashboard {
+  employee: {
+    name: string;
+    position: string;
+    department: string;
+    hireDate: string;
+  };
+  attendance: {
+    today: {
+      checkIn: string | null;
+      checkOut: string | null;
+      status: string;
+    };
+    monthlyRate: number;
+    presentToday: number;
+    absentToday: number;
+    attendanceRate: number;
+  };
+  attendanceTrend: Array<{
+    date: string;
+    present: number;
+    absent: number;
+    late: number;
+    onLeave: number;
+    attendanceRate: number;
+  }>;
+  leave: {
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
+  performance: {
+    averageRating: number;
+    totalReviews: number;
+    reviewsThisMonth: number;
+    performanceDistribution: PerformanceDistributionItem[];
+    latestReview: {
+      rating: number;
+      feedback: string;
+      reviewDate: string;
+    } | null;
+  };
+  notifications: {
+    unread: number;
+    latest: AppNotification[];
+  };
+  recentActivities: RecentActivity[];
+}
+
 export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
@@ -704,6 +753,7 @@ export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
   getAdminDashboard: () => api.get<AdminDashboard>("/dashboard/admin"),
+  getEmployeeDashboard: () => api.get<EmployeeDashboard>("/dashboard/employee"),
   getAdminAttendanceTrend: (period: AttendancePeriod) =>
     api.get<AttendanceTrendResponse>("/dashboard/admin/attendance", {
       params: { period },
