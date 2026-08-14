@@ -19,6 +19,7 @@ import {
   Loader2,
   LogOut,
   UserPlus,
+  Shield,
 } from "lucide-react";
 import Avatar from "@/components/common/Avatar";
 import {
@@ -27,6 +28,7 @@ import {
   useDeleteUser,
   useUpdateUserById,
   useAdminLogoutUser,
+  useMakeAdminUser,
 } from "@/features/users/users.hooks";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
@@ -71,10 +73,12 @@ const UsersPage = () => {
   const deleteUser = useDeleteUser();
   const updateUser = useUpdateUserById();
   const adminLogoutUser = useAdminLogoutUser();
+  const makeAdminUser = useMakeAdminUser();
   const createUser = useCreateUser();
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [editTarget, setEditTarget] = useState<User | null>(null);
   const [logoutTarget, setLogoutTarget] = useState<User | null>(null);
+  const [makeAdminTarget, setMakeAdminTarget] = useState<User | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const {
     register,
@@ -173,6 +177,17 @@ const UsersPage = () => {
       await adminLogoutUser.mutateAsync(logoutTarget.id);
       setLogoutTarget(null);
       toast.success("User logged out from all devices successfully!");
+      refetch();
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
+
+  const handleMakeAdmin = async () => {
+    if (!makeAdminTarget) return;
+    try {
+      await makeAdminUser.mutateAsync(makeAdminTarget.id);
+      setMakeAdminTarget(null);
       refetch();
     } catch {
       // Error is handled by the mutation
@@ -453,6 +468,20 @@ const UsersPage = () => {
                           >
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                           </button>
+                          {user.role !== "Admin" && !isCurrentUser(user.id) && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMakeAdminTarget(user);
+                              }}
+                              title="Make admin"
+                              aria-label={`Make ${fullName(user)} an admin`}
+                              className="flex items-center justify-center h-9 w-9 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                            >
+                              <Shield className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={(e) => {
@@ -724,8 +753,7 @@ const UsersPage = () => {
           role="dialog"
           aria-modal="true"
           aria-label="Logout user"
-        >
-          <div
+        >          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => {
               if (!adminLogoutUser.isPending) setLogoutTarget(null);
@@ -770,6 +798,67 @@ const UsersPage = () => {
                     <>
                       <LogOut className="w-4 h-4" />
                       Logout
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {makeAdminTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Make user admin"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!makeAdminUser.isPending) setMakeAdminTarget(null);
+            }}
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5">
+                <Shield className="w-8 h-8" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">
+                Make this user an admin?
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                You are about to promote{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {fullName(makeAdminTarget)}
+                </span>{" "}
+                to an Admin role.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setMakeAdminTarget(null)}
+                  disabled={makeAdminUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleMakeAdmin}
+                  disabled={makeAdminUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  {makeAdminUser.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Making admin...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4" />
+                      Confirm
                     </>
                   )}
                 </button>

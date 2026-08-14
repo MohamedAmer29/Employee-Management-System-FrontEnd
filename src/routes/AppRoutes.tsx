@@ -27,6 +27,8 @@ const UsersPage = lazy(() => import("../pages/Users"));
 const UserDetails = lazy(() => import("../pages/UserDetails"));
 const ManagersPage = lazy(() => import("../pages/Managers"));
 const ManagerDetails = lazy(() => import("../pages/ManagerDetails"));
+const AdminsPage = lazy(() => import("../pages/Admins"));
+const AdminDetails = lazy(() => import("../pages/AdminDetails"));
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useSelector(
@@ -96,6 +98,22 @@ const AppRoutes = () => {
             element={
               <Suspense fallback={<FullPageLoader />}>
                 <ManagerDetails />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admins"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <AdminsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admins/:id"
+            element={
+              <Suspense fallback={<FullPageLoader />}>
+                <AdminDetails />
               </Suspense>
             }
           />

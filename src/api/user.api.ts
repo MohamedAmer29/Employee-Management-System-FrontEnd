@@ -459,6 +459,74 @@ export interface ManagersResponse {
   };
 }
 
+export interface Admin {
+  id: number;
+  firstName: string;
+  lastName: string;
+  country: string;
+  city: string;
+  phoneNumber: string;
+  nationalId: string;
+  username: string;
+  profilePicture: string | null;
+  role: string;
+  tokenVersion: number;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  emailVerifiedAt: string | null;
+  employee: {
+    id: number;
+    isActive: boolean;
+    fullName: string;
+    email: string;
+    phone: string;
+    position: string;
+    role: string;
+    department: { id: number; name: string } | null;
+    createdAt: string;
+  } | null;
+}
+
+export interface AdminsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  departmentId?: string;
+}
+
+export interface AdminsResponse {
+  data: Admin[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface UpdateAdminRequest {
+  firstName?: string;
+  lastName?: string;
+  country?: string;
+  city?: string;
+  phoneNumber?: string;
+  nationalId?: string;
+  position?: string;
+}
+
+export interface CreateAdminRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  country: string;
+  city: string;
+  phoneNumber: string;
+  nationalId: string;
+  departmentId: string;
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
@@ -512,6 +580,18 @@ export const userApi = {
     api.get<AuditLogDetailResponse>(`/audit-logs/${id}`),
   getAdminManagers: (params?: ManagersParams) =>
     api.get<ManagersResponse>("/admin/managers", { params }),
+  getAdminAdmins: (params?: AdminsParams) =>
+    api.get<AdminsResponse>("/admin/admins", { params }),
+  getAdminAdminById: (id: string | number) =>
+    api.get<Admin>(`/admin/admins/${id}`),
+  createAdminAdmin: (data: CreateAdminRequest) =>
+    api.post<Admin>("/admin/admins", data),
+  updateAdminAdmin: (id: string | number, data: UpdateAdminRequest) =>
+    api.patch<Admin>(`/admin/admins/${id}`, data),
+  activateAdmin: (id: string | number) =>
+    api.patch<Admin>(`/admin/admins/${id}/activate`),
+  deactivateAdmin: (id: string | number) =>
+    api.patch<Admin>(`/admin/admins/${id}/deactivate`),
   getAdminManagerById: (id: string | number) =>
     api.get<Manager>(`/admin/managers/${id}`),
   updateAdminManager: (id: string | number, data: UpdateManagerRequest) =>
@@ -543,6 +623,8 @@ export const userApi = {
     api.patch<User>(`/users/${id}/deactivate`),
   adminLogoutUser: (id: string | number) =>
     api.post(`/admin/users/${id}/logout`),
+  makeAdminUser: (id: string | number) =>
+    api.post(`/admin/users/${id}/make-admin`),
   getDepartments: () => api.get<Department[]>("/department"),
   createDepartment: (name: string) =>
     api.post<Department>("/department", { name }),

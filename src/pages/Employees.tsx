@@ -17,6 +17,8 @@ import {
   X,
   Plus,
   Save,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Avatar from "@/components/common/Avatar";
 import {
@@ -32,6 +34,8 @@ import type { RootState } from "@/store/store";
 import type { UpdateEmployeeRequest, User } from "@/api/user.api";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+
+const PAGE_SIZES = [5, 10, 15, 20];
 
 const roleBadgeClass: Record<string, string> = {
   Admin: "bg-primary/10 text-primary",
@@ -62,6 +66,8 @@ const formatDate = (dateString: string) =>
 
 const Employees = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const navigate = useNavigate();
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const currentUserEmail = currentUser?.username?.toLowerCase();
@@ -252,6 +258,27 @@ const Employees = () => {
 
   const total = employees?.length ?? 0;
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredEmployees.length / pageSize),
+  );
+  const safePage = Math.min(page, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const pageEmployees = filteredEmployees.slice(
+    startIndex,
+    startIndex + pageSize,
+  );
+
+  const goTo = (target: number) => {
+    if (target < 1 || target > totalPages) return;
+    setPage(target);
+  };
+
+  const changePageSize = (nextSize: number) => {
+    setPageSize(nextSize);
+    setPage(1);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -287,7 +314,10 @@ const Employees = () => {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1);
+              }}
               placeholder="Search by name, email, phone, position, role, or department..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
@@ -336,7 +366,8 @@ const Employees = () => {
             </p>
           </div>
         ) : (
-          <div className="table-scrollbar max-h-[65vh] overflow-auto">
+          <>
+            <div className="table-scrollbar overflow-x-auto">
             <table className="w-full min-w-[960px]">
               <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-gray-800">
                 <tr>
@@ -367,7 +398,7 @@ const Employees = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredEmployees.map((employee) => (
+                {pageEmployees.map((employee) => (
                   <tr
                     key={employee.id}
                     onClick={() => navigate(`/employees/${employee.id}`)}
@@ -533,6 +564,52 @@ const Employees = () => {
               </tbody>
             </table>
           </div>
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Showing {startIndex + 1}–
+                {Math.min(startIndex + pageSize, filteredEmployees.length)} of{" "}
+                {filteredEmployees.length} employee
+                {filteredEmployees.length === 1 ? "" : "s"}
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => changePageSize(Number(e.target.value))}
+                aria-label="Rows per page"
+                className="px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+              >
+                {PAGE_SIZES.map((size) => (
+                  <option key={size} value={size}>
+                    {size} / page
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => goTo(safePage - 1)}
+                disabled={safePage === 1}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                Previous
+              </button>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {safePage} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => goTo(safePage + 1)}
+                disabled={safePage === totalPages}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </>
         )}
       </div>
 

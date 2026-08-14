@@ -140,6 +140,30 @@ export const useDeactivateUser = () => {
   });
 };
 
+export const useMakeAdminUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string | number) =>
+      userApi.makeAdminUser(id).then((response) => response.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admins"],
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      toast.success("User promoted to admin successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to make user admin");
+    },
+  });
+};
+
 export const useAdminLogoutUser = () => {
   const queryClient = useQueryClient();
 
@@ -176,6 +200,10 @@ export const useUploadUserProfilePicture = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["managers"],
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admins"],
         refetchType: "all",
       });
       queryClient.invalidateQueries({

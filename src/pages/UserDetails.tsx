@@ -30,6 +30,7 @@ import {
   UserCheck,
   UserX,
   LogOut,
+  Shield,
 } from "lucide-react";
 import Avatar from "@/components/common/Avatar";
 import ImageLightbox from "@/components/common/ImageLightbox";
@@ -41,6 +42,7 @@ import {
   useActivateUser,
   useDeactivateUser,
   useAdminLogoutUser,
+  useMakeAdminUser,
   useUploadUserProfilePicture,
 } from "@/features/users/users.hooks";
 import { getAssetUrl } from "@/utils/assetUrl";
@@ -104,6 +106,7 @@ const UserDetails = () => {
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
   const adminLogoutUser = useAdminLogoutUser();
+  const makeAdminUser = useMakeAdminUser();
   const uploadProfilePicture = useUploadUserProfilePicture();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -114,6 +117,7 @@ const UserDetails = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isConfirmingDeactivate, setIsConfirmingDeactivate] = useState(false);
   const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
+  const [isConfirmingMakeAdmin, setIsConfirmingMakeAdmin] = useState(false);
   const {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
@@ -221,6 +225,17 @@ const UserDetails = () => {
       await adminLogoutUser.mutateAsync(user.id);
       setIsConfirmingLogout(false);
       toast.success("User logged out from all devices successfully!");
+      refetch();
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
+
+  const handleMakeAdmin = async () => {
+    if (!user) return;
+    try {
+      await makeAdminUser.mutateAsync(user.id);
+      setIsConfirmingMakeAdmin(false);
       refetch();
     } catch {
       // Error is handled by the mutation
@@ -590,6 +605,21 @@ const UserDetails = () => {
             )}
             Logout
           </button>
+          {user.role !== "Admin" && !isCurrentUser && (
+            <button
+              type="button"
+              onClick={() => setIsConfirmingMakeAdmin(true)}
+              disabled={makeAdminUser.isPending}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {makeAdminUser.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Shield className="w-4 h-4" aria-hidden="true" />
+              )}
+              Make Admin
+            </button>
+          )}
         </div>
       </section>
 
@@ -985,6 +1015,67 @@ const UserDetails = () => {
                     <>
                       <LogOut className="w-4 h-4" />
                       Logout
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmingMakeAdmin && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Make user admin"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!makeAdminUser.isPending) setIsConfirmingMakeAdmin(false);
+            }}
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-5">
+                <Shield className="w-8 h-8" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">
+                Make this user an admin?
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                You are about to promote{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {displayName}
+                </span>{" "}
+                to an Admin role.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmingMakeAdmin(false)}
+                  disabled={makeAdminUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleMakeAdmin}
+                  disabled={makeAdminUser.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  {makeAdminUser.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Making admin...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4" />
+                      Confirm
                     </>
                   )}
                 </button>
