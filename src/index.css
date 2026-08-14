@@ -122,6 +122,21 @@ input:-webkit-autofill:active {
   animation: fadeOut 0.4s ease forwards;
 }
 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
 /* Sidebar scrollbar */
 .sidebar-scrollbar {
   scrollbar-width: thin;

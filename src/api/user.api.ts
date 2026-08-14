@@ -310,8 +310,181 @@ export interface AttendanceTrendPoint {
   absent: number;
 }
 
+export interface AttendanceSummary {
+  totalPresent: number;
+  totalAbsent: number;
+  totalLate: number;
+  totalLeave: number;
+  attendanceRate: number;
+  daysIncluded: number;
+}
+
+export interface AttendanceDaySummary {
+  date: string;
+  totalEmployees: number;
+  present: number;
+  absent: number;
+  onLeave: number;
+  late: number;
+  workingDays: number;
+  attendanceRate: number;
+}
+
+export interface EmployeeAttendanceSummary {
+  employeeId: number;
+  employeeName: string;
+  totalWorkingDays: number;
+  present: number;
+  absent: number;
+  leave: number;
+  late: number;
+  workingDays: number;
+  attendanceRate: number;
+}
+
+export interface TodayNotCheckedIn {
+  employeeId: number;
+  employeeName: string;
+  department: string;
+}
+
+export interface TodayDepartmentSummary {
+  department: string;
+  total: number;
+  present: number;
+  absent: number;
+  onLeave: number;
+  late: number;
+  attendanceRate: number;
+}
+
+export interface TodayAttendanceRecord {
+  id: string;
+  employeeId: number;
+  employeeName: string;
+  department: string;
+  date: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  status: string;
+}
+
+export interface AttendanceTodayResponse {
+  date: string;
+  totalEmployees: number;
+  totalExpected: number;
+  present: number;
+  absent: number;
+  onLeave: number;
+  late: number;
+  onTime: number;
+  checkedInToday: number;
+  checkedOutToday: number;
+  attendanceRate: number;
+  workingDays: number;
+  notCheckedIn: TodayNotCheckedIn[];
+  departments: TodayDepartmentSummary[];
+  attendance: TodayAttendanceRecord[];
+}
+
+export interface MonthlyAttendanceParams {
+  month: number;
+  year: number;
+  departmentId?: string;
+  employeeId?: string;
+  search?: string;
+}
+
+export interface MonthlyDayAttendance {
+  date: string;
+  day: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  status: string;
+  leaveReason: string | null;
+}
+
+export interface MonthlyEmployeeSummary {
+  workingDays: number;
+  present: number;
+  absent: number;
+  leave: number;
+  late: number;
+  attendanceRate: number;
+}
+
+export interface MonthlyAttendanceEmployee {
+  employeeId: number;
+  employeeName: string;
+  email: string;
+  department: string;
+  position: string;
+  summary: MonthlyEmployeeSummary;
+  attendance: MonthlyDayAttendance[];
+}
+
+export interface MonthlyAttendanceResponse {
+  month: number;
+  year: number;
+  totalEmployees: number;
+  employees: MonthlyAttendanceEmployee[];
+  summary: {
+    totalEmployees: number;
+    totalWorkingDays: number;
+    totalPresent: number;
+    totalAbsent: number;
+    totalLeave: number;
+    totalLate: number;
+    overallAttendanceRate: number;
+  };
+}
+
+export interface AbsentAttendanceParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  departmentId?: string;
+  employeeId?: string;
+}
+
+export interface AbsentAttendanceRecord {
+  id: string;
+  employeeId: number;
+  employeeName: string;
+  department: string;
+  date: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  status: string;
+}
+
+export interface AbsentAttendanceResponse {
+  data: AbsentAttendanceRecord[];
+  workingDays: number;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface DepartmentAttendanceSummary {
+  departmentId: number;
+  departmentName: string;
+  present: number;
+  absent: number;
+  late: number;
+  onLeave: number;
+  attendanceRate: number;
+}
+
 export interface AttendanceTrendResponse {
   attendanceTrend: AttendanceTrendPoint[];
+  summary: AttendanceSummary;
+  departments: DepartmentAttendanceSummary[];
 }
 
 export interface AttendanceRecord {
@@ -534,6 +707,24 @@ export const userApi = {
   getAdminAttendanceTrend: (period: AttendancePeriod) =>
     api.get<AttendanceTrendResponse>("/dashboard/admin/attendance", {
       params: { period },
+    }),
+  getAdminAttendanceSummary: (date: string) =>
+    api.get<AttendanceDaySummary>("/admin/attendance/summary", {
+      params: { date },
+    }),
+  getAdminEmployeeAttendanceSummary: (employeeId: string) =>
+    api.get<EmployeeAttendanceSummary>(
+      `/admin/attendance/employee/${employeeId}/summary`,
+    ),
+  getAdminAttendanceToday: () =>
+    api.get<AttendanceTodayResponse>("/admin/attendance/today"),
+  getAdminMonthlyAttendance: (params: MonthlyAttendanceParams) =>
+    api.get<MonthlyAttendanceResponse>("/admin/attendance/monthly", {
+      params,
+    }),
+  getAdminAbsentAttendance: (params?: AbsentAttendanceParams) =>
+    api.get<AbsentAttendanceResponse>("/admin/attendance/absent", {
+      params,
     }),
   getAttendance: () => api.get<AttendanceRecord[]>("/attendance"),
   getAttendanceByEmployeeId: (employeeId: string) =>

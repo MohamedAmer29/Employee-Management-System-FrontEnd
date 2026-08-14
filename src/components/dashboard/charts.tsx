@@ -3,8 +3,11 @@ import {
   Chart,
   DoughnutController,
   BarController,
+  LineController,
   ArcElement,
   BarElement,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip,
@@ -16,8 +19,11 @@ import { useTheme } from "@/hooks/useTheme";
 Chart.register(
   DoughnutController,
   BarController,
+  LineController,
   ArcElement,
   BarElement,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip,
@@ -28,6 +34,13 @@ export interface ChartItem {
   label: string;
   value: number;
   color?: string;
+}
+
+interface DelayContext {
+  type?: string;
+  index?: number;
+  xStarted?: boolean;
+  yStarted?: boolean;
 }
 
 interface ChartCardProps {
@@ -108,6 +121,12 @@ export const DoughnutChartCard = ({ title, items, height = 240 }: ChartCardProps
         responsive: true,
         maintainAspectRatio: false,
         cutout: "62%",
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          easing: "easeInOutQuart",
+          duration: 800,
+        },
         plugins: {
           legend: {
             position: "bottom",
@@ -151,6 +170,145 @@ export const DoughnutChartCard = ({ title, items, height = 240 }: ChartCardProps
   );
 };
 
+export interface LineSeries {
+  title: string;
+  color: string;
+  items: ChartItem[];
+}
+
+interface LineChartCardProps {
+  title: string;
+  series: LineSeries[];
+  height?: number;
+  pointDelay?: number;
+  duration?: number;
+}
+
+export const LineChartCard = ({
+  title,
+  series,
+  height = 320,
+  pointDelay = 100,
+  duration = 1000,
+}: LineChartCardProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<Chart<"line"> | null>(null);
+  const { theme } = useTheme();
+
+  const labels = useMemo(
+    () => series[0]?.items.map((item) => item.label) ?? [],
+    [series],
+  );
+
+  const hasData = useMemo(
+    () => series.some((s) => s.items.some((item) => item.value > 0)),
+    [series],
+  );
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !hasData || labels.length === 0) return;
+
+    const themeColors = getThemeColors(theme);
+    const datasets = series
+      .filter((s) => s.items.length > 0)
+      .map((s) => ({
+        label: s.title,
+        data: s.items.map((item) => item.value),
+        borderColor: s.color,
+        backgroundColor: s.color,
+        pointBackgroundColor: s.color,
+        pointBorderColor: themeColors.border,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        tension: 0.3,
+        fill: false,
+      }));
+
+    const config = {
+      type: "line",
+      data: {
+        labels,
+        datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        animation: {
+          x: {
+            type: "number",
+            easing: "easeInOutQuart",
+            from: NaN,
+            delay(context: DelayContext) {
+              if (context.type !== "data") return 0;
+              if (context.xStarted) return 0;
+              context.xStarted = true;
+              return (context.index ?? 0) * pointDelay;
+            },
+            duration,
+          },
+          y: {
+            type: "number",
+            easing: "easeInOutQuart",
+            from: NaN,
+            delay(context: DelayContext) {
+              if (context.type !== "data") return 0;
+              if (context.yStarted) return 0;
+              context.yStarted = true;
+              return (context.index ?? 0) * pointDelay;
+            },
+            duration,
+          },
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: themeColors.tick,
+              boxWidth: 12,
+              boxHeight: 12,
+              usePointStyle: true,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: themeColors.tick },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: themeColors.grid },
+            ticks: { color: themeColors.tick, precision: 0 },
+          },
+        },
+      },
+    } as unknown as ChartConfiguration<"line">;
+
+    Chart.getChart(canvas)?.destroy();
+    chartRef.current?.destroy();
+    chartRef.current = new Chart(canvas, config);
+
+    return () => {
+      chartRef.current?.destroy();
+      chartRef.current = null;
+    };
+  }, [series, labels, hasData, theme, pointDelay, duration]);
+
+  return (
+    <ChartShell title={title}>
+      {hasData ? (
+        <div style={{ height }}>
+          <canvas ref={canvasRef} />
+        </div>
+      ) : (
+        <EmptyChart height={height} />
+      )}
+    </ChartShell>
+  );
+};
+
 export const BarChartCard = ({ title, items, height = 240 }: ChartCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart<"bar"> | null>(null);
@@ -164,7 +322,7 @@ export const BarChartCard = ({ title, items, height = 240 }: ChartCardProps) => 
     if (!canvas || !hasData) return;
 
     const themeColors = getThemeColors(theme);
-    const config: ChartConfiguration<"bar"> = {
+    const config = {
       type: "bar",
       data: {
         labels: items.map((item) => item.label),
@@ -180,6 +338,13 @@ export const BarChartCard = ({ title, items, height = 240 }: ChartCardProps) => 
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          y: {
+            from: 0,
+            easing: "easeInOutQuart",
+            duration: 800,
+          },
+        },
         plugins: {
           legend: { display: false },
         },
@@ -195,7 +360,7 @@ export const BarChartCard = ({ title, items, height = 240 }: ChartCardProps) => 
           },
         },
       },
-    };
+    } as unknown as ChartConfiguration<"bar">;
 
     Chart.getChart(canvas)?.destroy();
     chartRef.current?.destroy();

@@ -1,16 +1,27 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { getAuthToken, clearAuthToken } from '../utils/authToken';
 import { store } from '../store/store';
 import { clearUser } from '../store/slices/authSlice';
+import { queryClient } from './queryClient';
 
 // Public/pre-auth endpoints whose 401s should NOT trigger an auto-logout redirect.
 const SKIP_LOGOUT_PATHS = [
   '/auth/login',
   '/auth/register',
   '/auth/refresh-token',
+  '/auth/logout',
+  '/auth/logout-all',
   '/auth/verify-email',
   '/auth/resend-verification-otp',
 ];
+
+// Logout requests must rely on the httpOnly refresh_token cookie, NOT the
+// (possibly expired) access token. Sending an expired access token causes some
+// backends to reject the request with 401 before the logout handler runs, so
+// the refresh token is never revoked. Omitting the header lets the backend
+// revoke/delete the refresh token regardless of access token expiry.
+const LOGOUT_PATHS = ['/auth/logout', '/auth/logout-all'];
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -22,8 +33,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  const url: string = config.url ?? '';
   const token = getAuthToken();
-  if (token) {
+  if (token && !LOGOUT_PATHS.some((path) => url.includes(path))) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -51,6 +63,38 @@ const extractErrorMessage = (data: unknown, fallback: string): string => {
   return fallback;
 };
 
+let isHandlingExpiredSession = false;
+
+// Clears local auth state and notifies the backend so the refresh token is
+// revoked. Safe to call even when the access token is already invalid.
+const forceLogout = () => {
+  if (isHandlingExpiredSession) return;
+  isHandlingExpiredSession = true;
+
+  try {
+    if (getAuthToken()) {
+      // Fire-and-forget so the backend deletes the refresh token (cookie).
+      const baseUrl = String(import.meta.env.VITE_BACKEND_URL ?? '').replace(
+        /\/+$/,
+        '',
+      );
+      axios
+        .post(`${baseUrl}/auth/logout`, undefined, {
+          withCredentials: true,
+          timeout: 10000,
+        })
+        .catch(() => undefined);
+    }
+  } finally {
+    clearAuthToken();
+    queryClient.removeQueries();
+    store.dispatch(clearUser());
+    toast.error('Your session has expired. Please log in again.', {
+      toastId: 'session-expired',
+    });
+  }
+};
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -58,8 +102,7 @@ api.interceptors.response.use(
     const url: string = error.config?.url ?? '';
 
     if (status === 401 && !SKIP_LOGOUT_PATHS.some((p) => url.includes(p))) {
-      clearAuthToken();
-      store.dispatch(clearUser());
+      forceLogout();
     }
 
     const message = extractErrorMessage(

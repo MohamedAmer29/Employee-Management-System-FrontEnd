@@ -16,6 +16,9 @@ import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
 import AttendanceDetails from "../pages/AttendanceDetails";
+import TodayAttendance from "../pages/TodayAttendance";
+import MonthlyAttendance from "../pages/MonthlyAttendance";
+import AbsentAttendance from "../pages/AbsentAttendance";
 import Leave from "../pages/Leave";
 import LeaveDetails from "../pages/LeaveDetails";
 import Performance from "../pages/Performance";
@@ -118,6 +121,9 @@ const AppRoutes = () => {
             }
           />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/attendance/today" element={<TodayAttendance />} />
+          <Route path="/attendance/monthly" element={<MonthlyAttendance />} />
+          <Route path="/attendance/absent" element={<AbsentAttendance />} />
           <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
           <Route
             path="/users"
