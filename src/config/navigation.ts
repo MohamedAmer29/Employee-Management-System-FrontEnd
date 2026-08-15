@@ -102,7 +102,7 @@ export const navigationGroups: NavGroup[] = [
         label: "Settings",
         path: "/settings",
         icon: Settings,
-        roles: ["Admin"],
+        roles: ["Admin", "Manager", "Employee"],
       },
     ],
   },

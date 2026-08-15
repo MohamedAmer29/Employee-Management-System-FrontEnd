@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarCheck,
   UserCheck,
@@ -145,6 +145,23 @@ const MyAttendance = () => {
       : isBeforeCheckOutTime
         ? "Didn't come 4 o'clock yet"
         : "";
+
+  const isPastAutoCheckOutTime =
+    nowTime.hour > 18 || (nowTime.hour === 18 && nowTime.minute > 0);
+
+  const autoCheckedOutDayRef = useRef<string>("");
+
+  useEffect(() => {
+    if (
+      checkedInToday &&
+      !checkedOutToday &&
+      isPastAutoCheckOutTime &&
+      autoCheckedOutDayRef.current !== todayStr
+    ) {
+      autoCheckedOutDayRef.current = todayStr;
+      checkOut();
+    }
+  }, [checkedInToday, checkedOutToday, isPastAutoCheckOutTime, todayStr, checkOut]);
 
   const breakdownChartItems: ChartItem[] = useMemo(
     () =>

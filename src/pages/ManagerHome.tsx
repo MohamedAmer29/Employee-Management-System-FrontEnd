@@ -16,18 +16,18 @@ import {
   ScrollText,
   ChevronLeft,
   ChevronRight,
-  ArrowRight,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/store/store";
 import { useCurrentUser } from "@/features/user/user.hooks";
-import { useAdminDashboard } from "@/features/dashboard/dashboard.hooks";
-import EmployeeHome from "@/pages/EmployeeHome";
-import ManagerHome from "@/pages/ManagerHome";
-import FullPageLoader from "@/components/common/FullPageLoader";
+import { useManagerDashboard } from "@/features/dashboard/dashboard.hooks";
 import StatCard from "@/components/dashboard/StatCard";
-import { DoughnutChartCard, BarChartCard } from "@/components/dashboard/charts";
-import type { RecentActivity } from "@/api/user.api";
+import {
+  DoughnutChartCard,
+  LineChartCard,
+  type ChartItem,
+} from "@/components/dashboard/charts";
+import type { ManagerRecentActivity } from "@/api/user.api";
+import { formatDateInUserZone } from "@/utils/formatDate";
 
 const ACTIVITIES_PER_PAGE = 7;
 
@@ -76,8 +76,12 @@ const getActivityIcon = (action: string) =>
     className: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
   };
 
-const ActivityItem = ({ activity }: { activity: RecentActivity }) => {
-  const { icon: Icon, className } = getActivityIcon(activity.action);
+const ActivityItem = ({ activity }: { activity: ManagerRecentActivity }) => {
+  const { icon: Icon, className } = getActivityIcon(activity.auditLog_action);
+  const userName =
+    [activity.user_firstName, activity.user_lastName]
+      .filter(Boolean)
+      .join(" ") || "Unknown";
 
   return (
     <li className="flex items-start gap-3">
@@ -88,11 +92,10 @@ const ActivityItem = ({ activity }: { activity: RecentActivity }) => {
       </span>
       <div className="min-w-0">
         <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
-          {activity.description}
+          {activity.auditLog_description}
         </p>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-          {activity.user !== "null null" ? activity.user : "Unknown"} ·{" "}
-          {activity.entity}
+          {userName} · {activity.auditLog_entity}
         </p>
       </div>
     </li>
@@ -119,11 +122,10 @@ const Panel = ({
   </section>
 );
 
-const AdminHome = () => {
-  const navigate = useNavigate();
+const ManagerHome = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUserQuery = useCurrentUser();
-  const dashboardQuery = useAdminDashboard();
+  const dashboardQuery = useManagerDashboard();
 
   const dashboard = dashboardQuery.data;
   const displayName =
@@ -139,7 +141,6 @@ const AdminHome = () => {
   );
   const [activityPage, setActivityPage] = useState(0);
 
-  // Clamp during render so a shrunken list can't leave the page out of range.
   const page = Math.min(activityPage, totalPages - 1);
 
   const pageActivities = activities.slice(
@@ -147,83 +148,117 @@ const AdminHome = () => {
     (page + 1) * ACTIVITIES_PER_PAGE,
   );
 
-  const employeeChartItems = useMemo(() => {
-    if (!dashboard) return [];
-    return [
-      { label: "Active", value: dashboard.employees.active, color: "#10B981" },
-      {
-        label: "Inactive",
-        value: dashboard.employees.inactive,
-        color: "#EF4444",
-      },
-    ];
-  }, [dashboard]);
+  const attendanceChartItems: ChartItem[] = useMemo(
+    () =>
+      dashboard
+        ? [
+            {
+              label: "Present",
+              value: dashboard.attendance.presentToday,
+              color: "#10B981",
+            },
+            {
+              label: "Absent",
+              value: dashboard.attendance.absentToday,
+              color: "#EF4444",
+            },
+            {
+              label: "Late",
+              value: dashboard.attendance.lateToday,
+              color: "#F59E0B",
+            },
+            {
+              label: "On Leave",
+              value: dashboard.attendance.onLeaveToday,
+              color: "#0EA5E9",
+            },
+          ]
+        : [],
+    [dashboard],
+  );
 
-  const attendanceChartItems = useMemo(() => {
-    if (!dashboard) return [];
-    return [
-      {
-        label: "Present",
-        value: dashboard.attendance.presentToday,
+  const leaveChartItems: ChartItem[] = useMemo(
+    () =>
+      dashboard
+        ? [
+            {
+              label: "Pending",
+              value: dashboard.leave.pending,
+              color: "#F59E0B",
+            },
+            {
+              label: "Approved",
+              value: dashboard.leave.approved,
+              color: "#10B981",
+            },
+            {
+              label: "Rejected",
+              value: dashboard.leave.rejected,
+              color: "#EF4444",
+            },
+          ]
+        : [],
+    [dashboard],
+  );
+
+  const performanceChartItems: ChartItem[] = useMemo(
+    () =>
+      (dashboard?.performance.performanceDistribution ?? []).map((item) => ({
+        label: `${item.rating} stars`,
+        value: item.count,
+      })),
+    [dashboard],
+  );
+
+  const presentTrend: ChartItem[] = useMemo(
+    () =>
+      (dashboard?.attendanceTrend ?? []).map((point) => ({
+        label: formatDateInUserZone(point.date, { dateOnly: true }),
+        value: point.present,
         color: "#10B981",
-      },
-      {
-        label: "Absent",
-        value: dashboard.attendance.absentToday,
+      })),
+    [dashboard],
+  );
+
+  const absentTrend: ChartItem[] = useMemo(
+    () =>
+      (dashboard?.attendanceTrend ?? []).map((point) => ({
+        label: formatDateInUserZone(point.date, { dateOnly: true }),
+        value: point.absent,
         color: "#EF4444",
-      },
-    ];
-  }, [dashboard]);
-
-  const leaveChartItems = useMemo(() => {
-    if (!dashboard) return [];
-    return [
-      { label: "Pending", value: dashboard.leave.pending, color: "#F59E0B" },
-      { label: "Approved", value: dashboard.leave.approved, color: "#10B981" },
-      { label: "Rejected", value: dashboard.leave.rejected, color: "#EF4444" },
-    ];
-  }, [dashboard]);
-
-  const departmentChartItems = useMemo(() => {
-    if (!dashboard) return [];
-    return dashboard.departments.employeesPerDepartment.map((dept) => ({
-      label: dept.departmentName ?? "Unassigned",
-      value: dept.employeeCount ?? 0,
-    }));
-  }, [dashboard]);
-
-  const performanceChartItems = useMemo(() => {
-    if (!dashboard) return [];
-    return dashboard.performance.performanceDistribution.map((item) => ({
-      label: `${item.rating} stars`,
-      value: item.count,
-    }));
-  }, [dashboard]);
+      })),
+    [dashboard],
+  );
 
   const statCards = [
     {
       icon: Users,
       label: "Employees",
       value: dashboard?.employees.total ?? "—",
-      hint: dashboard
-        ? `${dashboard.employees.active} active · ${dashboard.employees.inactive} inactive · ${dashboard.employees.newThisMonth} new this month`
-        : undefined,
+      hint: dashboard ? `${dashboard.employees.active} active` : undefined,
+      accentClass: "bg-primary/10 text-primary",
     },
     {
       icon: CalendarCheck,
       label: "Attendance Today",
       value: dashboard?.attendance.presentToday ?? "—",
       hint: dashboard
-        ? `${dashboard.attendance.checkedInToday} checked in · ${dashboard.attendance.checkedOutToday} checked out · ${dashboard.attendance.absentToday} absent`
+        ? `${dashboard.attendance.absentToday} absent · ${dashboard.attendance.lateToday} late · ${dashboard.attendance.onLeaveToday} on leave`
         : undefined,
+      accentClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     },
     {
       icon: CalendarDays,
       label: "Leave Requests",
-      value: dashboard?.leave.total ?? "—",
+      value: dashboard
+        ? dashboard.leave.pending +
+          dashboard.leave.approved +
+          dashboard.leave.rejected
+        : "—",
       hint: dashboard
         ? `${dashboard.leave.pending} pending · ${dashboard.leave.approved} approved · ${dashboard.leave.rejected} rejected`
         : undefined,
+      accentClass: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
     },
     {
       icon: TrendingUp,
@@ -235,6 +270,7 @@ const AdminHome = () => {
       hint: dashboard
         ? `${dashboard.performance.totalReviews} total reviews · ${dashboard.performance.reviewsThisMonth} this month`
         : undefined,
+      accentClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     },
   ] as const;
 
@@ -261,7 +297,7 @@ const AdminHome = () => {
           Dashboard
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          An overview of your organization's activity.
+          An overview of your department's activity.
         </p>
       </div>
 
@@ -280,7 +316,9 @@ const AdminHome = () => {
             {displayName} 👋
           </h2>
           <p className="text-sm text-white/75 mt-2 max-w-xl">
-            Here's what's happening with your organization today.
+            {dashboard
+              ? `Here's what's happening in the ${dashboard.department.name} department today.`
+              : "Here's what's happening in your department today."}
           </p>
         </div>
       </section>
@@ -307,6 +345,7 @@ const AdminHome = () => {
               label={card.label}
               value={card.value}
               hint={card.hint}
+              accentClass={card.accentClass}
             />
           ))}
         </div>
@@ -328,51 +367,45 @@ const AdminHome = () => {
             ))}
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-              <DoughnutChartCard title="Employees" items={employeeChartItems} />
-              <DoughnutChartCard
-                title="Attendance Today"
-                items={attendanceChartItems}
-              />
-              <DoughnutChartCard
-                title="Leave Requests"
-                items={leaveChartItems}
-              />
-            </div>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-5">
-              <BarChartCard
-                title="Employees per Department"
-                items={departmentChartItems}
-              />
-              <BarChartCard
-                title="Performance Distribution"
-                items={performanceChartItems}
-              />
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+            <DoughnutChartCard
+              title="Attendance Today"
+              items={attendanceChartItems}
+            />
+            <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
+            <DoughnutChartCard
+              title="Performance Distribution"
+              items={performanceChartItems}
+            />
+          </div>
         )}
+
+        <Panel title="Attendance Trend">
+          {dashboardQuery.isLoading ? (
+            <div className="h-64 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+          ) : presentTrend.length > 0 ? (
+            <LineChartCard
+              title="Present vs Absent"
+              series={[
+                { title: "Present", color: "#10B981", items: presentTrend },
+                { title: "Absent", color: "#EF4444", items: absentTrend },
+              ]}
+              pointDelay={50}
+              duration={800}
+            />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No attendance trend data yet.
+            </p>
+          )}
+        </Panel>
       </section>
 
       {/* Secondary panels */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
         <div className="xl:col-span-2">
-          <Panel
-            title="Recent Activities"
-            action={
-              user?.role === "Admin" ? (
-                <button
-                  type="button"
-                  onClick={() => navigate("/audit-logs")}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                >
-                  View All
-                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                </button>
-              ) : undefined
-            }
-          >
+          <Panel title="Recent Activities">
             {dashboardQuery.isLoading ? (
               <div className="space-y-3 animate-pulse">
                 {Array.from({ length: 4 }).map((_, index) => (
@@ -389,7 +422,7 @@ const AdminHome = () => {
               <>
                 <ul className="space-y-4">
                   {pageActivities.map((activity) => (
-                    <ActivityItem key={activity.id} activity={activity} />
+                    <ActivityItem key={activity.auditLog_id} activity={activity} />
                   ))}
                 </ul>
                 {totalPages > 1 && (
@@ -439,7 +472,7 @@ const AdminHome = () => {
 
         {/* Summary column */}
         <div className="space-y-4 sm:space-y-5">
-          <Panel title="Departments">
+          <Panel title="Department">
             {dashboardQuery.isLoading ? (
               <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
             ) : (
@@ -449,10 +482,10 @@ const AdminHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.departments.total ?? 0}
+                    {dashboard?.department.name ?? "—"}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Total departments
+                    Your department
                   </p>
                 </div>
               </div>
@@ -469,10 +502,10 @@ const AdminHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.notifications.unread ?? 0}
+                    {dashboard?.unreadNotifications ?? 0}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Unread · {dashboard?.notifications.total ?? 0} total
+                    Unread notifications
                   </p>
                 </div>
               </div>
@@ -492,7 +525,8 @@ const AdminHome = () => {
                     {dashboard?.attendance.attendanceRate ?? 0}%
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Today's rate
+                    Today's rate · {dashboard?.attendance.monthlyRate ?? 0}% this
+                    month
                   </p>
                 </div>
               </div>
@@ -504,25 +538,4 @@ const AdminHome = () => {
   );
 };
 
-const Home = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
-
-  // The user record is only available after session restore completes.
-  // Rendering either dashboard before that could fire a request for the
-  // wrong endpoint (e.g. an employee hitting /dashboard/admin).
-  if (!user) {
-    return <FullPageLoader />;
-  }
-
-  if (user.role === "Employee") {
-    return <EmployeeHome />;
-  }
-
-  if (user.role === "Manager") {
-    return <ManagerHome />;
-  }
-
-  return <AdminHome />;
-};
-
-export default Home;
+export default ManagerHome;

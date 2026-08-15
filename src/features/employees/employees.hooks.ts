@@ -4,6 +4,11 @@ import { userApi } from "../../api/user.api";
 import { toast } from "react-toastify";
 import { setUser } from "../../store/slices/authSlice";
 import type { RootState } from "../../store/store";
+import type {
+  ManagerEmployeeParams,
+  CreateManagerEmployeeRequest,
+  UpdateManagerEmployeeRequest,
+} from "../../api/user.api";
 
 export const useEmployees = () => {
   return useQuery({
@@ -195,6 +200,102 @@ export const useUpdateEmployee = () => {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to update employee");
+    },
+  });
+};
+
+export const useManagerEmployees = (params?: ManagerEmployeeParams) => {
+  return useQuery({
+    queryKey: ["managerEmployees", params],
+    queryFn: () =>
+      userApi.getManagerEmployees(params).then((response) => response.data),
+  });
+};
+
+export const useManagerEmployee = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["managerEmployees", id],
+    queryFn: () =>
+      userApi
+        .getManagerEmployeeById(id as string)
+        .then((response) => response.data),
+    enabled: Boolean(id),
+  });
+};
+
+export const useCreateManagerEmployee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateManagerEmployeeRequest) =>
+      userApi.createManagerEmployee(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["managerEmployees"] });
+      toast.success("Employee created successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create employee");
+    },
+  });
+};
+
+export const useUpdateManagerEmployee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string | number;
+      data: UpdateManagerEmployeeRequest;
+    }) => userApi.updateManagerEmployee(id, data),
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData(
+        ["managerEmployees", String(variables.id)],
+        response.data,
+      );
+      queryClient.invalidateQueries({ queryKey: ["managerEmployees"] });
+      toast.success("Employee updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update employee");
+    },
+  });
+};
+
+export const useDeleteManagerEmployee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string | number) => userApi.deleteManagerEmployee(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["managerEmployees"] });
+      toast.success("Employee deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete employee");
+    },
+  });
+};
+
+export const useUpdateManagerEmployeeStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      isActive,
+    }: {
+      id: string | number;
+      isActive: boolean;
+    }) => userApi.updateManagerEmployeeStatus(id, isActive),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["managerEmployees"] });
+      toast.success("Employee status updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update employee status");
     },
   });
 };

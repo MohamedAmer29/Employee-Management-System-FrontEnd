@@ -87,7 +87,7 @@ const forceLogout = () => {
     }
   } finally {
     clearAuthToken();
-    queryClient.removeQueries();
+    queryClient.clear();
     store.dispatch(clearUser());
     toast.error('Your session has expired. Please log in again.', {
       toastId: 'session-expired',

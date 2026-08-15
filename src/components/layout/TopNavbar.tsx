@@ -314,23 +314,23 @@ const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
                     />
                     Profile
                   </button>
-                  {role === "Admin" && (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className={menuItemClass}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        navigate("/settings");
-                      }}
-                    >
-                      <Settings
-                        className="w-4 h-4 text-gray-400 dark:text-gray-500"
-                        aria-hidden="true"
-                      />
-                      Settings
-                    </button>
-                  )}
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={menuItemClass}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate("/settings");
+                    }}
+                  >
+                    <Settings
+                      className="w-4 h-4 text-gray-400 dark:text-gray-500"
+                      aria-hidden="true"
+                    />
+                    Settings
+                  </button>
+
                   <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
                   <button
                     type="button"

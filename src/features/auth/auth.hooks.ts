@@ -94,7 +94,7 @@ export const useLogout = () => {
 
   const handleLogout = () => {
     dispatch(clearUser());
-    queryClient.removeQueries({ queryKey: ["currentUser"] });
+    queryClient.clear();
     navigate("/login", { replace: true });
   };
 

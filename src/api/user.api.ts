@@ -78,6 +78,62 @@ export interface AdminDashboard {
   recentActivities: RecentActivity[];
 }
 
+export interface ManagerRecentActivity {
+  auditLog_id: string;
+  auditLog_action: string;
+  auditLog_entity: string;
+  auditLog_description: string;
+  auditLog_created_at: string;
+  user_firstName: string;
+  user_lastName: string;
+}
+
+export interface ManagerDashboard {
+  department: {
+    id: number;
+    name: string;
+  };
+  employees: {
+    total: number;
+    active: number;
+  };
+  attendance: {
+    presentToday: number;
+    absentToday: number;
+    lateToday: number;
+    onLeaveToday: number;
+    attendanceRate: number;
+    monthlyRate: number;
+  };
+  attendanceTrend: Array<{
+    date: string;
+    present: number;
+    absent: number;
+    late: number;
+    onLeave: number;
+    attendanceRate: number;
+  }>;
+  leave: {
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
+  pendingLeaves: unknown[];
+  performance: {
+    averageRating: number;
+    totalReviews: number;
+    reviewsThisMonth: number;
+    performanceDistribution: PerformanceDistributionItem[];
+    latestReview: {
+      rating: number;
+      feedback: string;
+      reviewDate: string;
+    } | null;
+  };
+  unreadNotifications: number;
+  recentActivities: ManagerRecentActivity[];
+}
+
 export interface EmployeeDashboard {
   employee: {
     name: string;
@@ -352,6 +408,36 @@ export interface Department {
 }
 
 export type AttendancePeriod = "today" | "week" | "month" | "year";
+
+export interface ManagerEmployeeParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}
+
+export interface ManagerEmployeesResponse {
+  data: EmployeeDetail[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateManagerEmployeeRequest {
+  email: string;
+  position: string;
+}
+
+export interface UpdateManagerEmployeeRequest {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  position?: string;
+  isActive?: boolean;
+}
 
 export interface AttendanceTrendPoint {
   date: string;
@@ -771,6 +857,7 @@ export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
   getAdminDashboard: () => api.get<AdminDashboard>("/dashboard/admin"),
+  getManagerDashboard: () => api.get<ManagerDashboard>("/dashboard/manager"),
   getEmployeeDashboard: () => api.get<EmployeeDashboard>("/dashboard/employee"),
   getAdminAttendanceTrend: (period: AttendancePeriod) =>
     api.get<AttendanceTrendResponse>("/dashboard/admin/attendance", {
@@ -899,6 +986,20 @@ export const userApi = {
       employeeIds,
     }),
   getEmployees: () => api.get<Employee[]>("/employees"),
+  getManagerEmployees: (params?: ManagerEmployeeParams) =>
+    api.get<ManagerEmployeesResponse>("/manager/employees", { params }),
+  getManagerEmployeeById: (id: string | number) =>
+    api.get<EmployeeDetail>(`/manager/employees/${id}`),
+  createManagerEmployee: (data: CreateManagerEmployeeRequest) =>
+    api.post<EmployeeDetail>("/manager/employees", data),
+  updateManagerEmployee: (
+    id: string | number,
+    data: UpdateManagerEmployeeRequest,
+  ) => api.patch<EmployeeDetail>(`/manager/employees/${id}`, data),
+  deleteManagerEmployee: (id: string | number) =>
+    api.delete<{ message: string }>(`/manager/employees/${id}`),
+  updateManagerEmployeeStatus: (id: string | number, isActive: boolean) =>
+    api.patch<EmployeeDetail>(`/manager/employees/${id}/status`, { isActive }),
   createEmployee: (data: UpdateEmployeeRequest) =>
     api.post<EmployeeDetail>("/employees", data),
   getEmployeeById: (id: string) => api.get<EmployeeDetail>(`/employees/${id}`),

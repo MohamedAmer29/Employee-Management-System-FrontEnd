@@ -12,6 +12,8 @@ import Notifications from "../pages/Notifications";
 import Settings from "../pages/Settings";
 import Employees from "../pages/Employees";
 import EmployeeDetails from "../pages/EmployeeDetails";
+import ManagerEmployees from "../pages/manager/ManagerEmployees";
+import ManagerEmployeeDetails from "../pages/manager/ManagerEmployeeDetails";
 import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
@@ -80,6 +82,26 @@ const AttendanceRoute = () => {
   return <Attendance />;
 };
 
+const EmployeesRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Manager") {
+    return <ManagerEmployees />;
+  }
+
+  return <Employees />;
+};
+
+const EmployeeDetailsRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Manager") {
+    return <ManagerEmployeeDetails />;
+  }
+
+  return <EmployeeDetails />;
+};
+
 const LeaveRoute = () => {
   const role = useSelector((state: RootState) => state.auth.user?.role);
 
@@ -107,8 +129,8 @@ const AppRoutes = () => {
           <Route path="/audit-logs/:id" element={<AuditLogDetails />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="/employees/:id" element={<EmployeeDetails />} />
+          <Route path="/employees" element={<EmployeesRoute />} />
+          <Route path="/employees/:id" element={<EmployeeDetailsRoute />} />
           <Route path="/departments" element={<Departments />} />
           <Route path="/departments/:id" element={<DepartmentDetails />} />
           <Route

@@ -17,6 +17,20 @@ export const useAdminDashboard = () => {
   });
 };
 
+export const useManagerDashboard = () => {
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  return useQuery({
+    queryKey: ["dashboard", "manager"],
+    queryFn: () =>
+      userApi.getManagerDashboard().then((response) => response.data),
+    enabled: !!accessToken,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+};
+
 export const useEmployeeDashboard = () => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
