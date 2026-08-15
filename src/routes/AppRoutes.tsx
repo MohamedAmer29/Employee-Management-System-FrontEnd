@@ -15,6 +15,8 @@ import EmployeeDetails from "../pages/EmployeeDetails";
 import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
+import MyAttendance from "../pages/employee/MyAttendance";
+import MyLeave from "../pages/employee/MyLeave";
 import AttendanceDetails from "../pages/AttendanceDetails";
 import TodayAttendance from "../pages/TodayAttendance";
 import MonthlyAttendance from "../pages/MonthlyAttendance";
@@ -24,6 +26,7 @@ import LeaveDetails from "../pages/LeaveDetails";
 import Performance from "../pages/Performance";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
+import type { RootState } from "../store/store";
 
 // Lazy-loaded routes to reduce the initial bundle size
 const UsersPage = lazy(() => import("../pages/Users"));
@@ -65,6 +68,26 @@ const PublicRoute = () => {
   }
 
   return <Outlet />;
+};
+
+const AttendanceRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Employee") {
+    return <MyAttendance />;
+  }
+
+  return <Attendance />;
+};
+
+const LeaveRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Employee") {
+    return <MyLeave />;
+  }
+
+  return <Leave />;
 };
 
 const AppRoutes = () => {
@@ -120,7 +143,7 @@ const AppRoutes = () => {
               </Suspense>
             }
           />
-          <Route path="/attendance" element={<Attendance />} />
+          <Route path="/attendance" element={<AttendanceRoute />} />
           <Route path="/attendance/today" element={<TodayAttendance />} />
           <Route path="/attendance/monthly" element={<MonthlyAttendance />} />
           <Route path="/attendance/absent" element={<AbsentAttendance />} />
@@ -141,7 +164,7 @@ const AppRoutes = () => {
               </Suspense>
             }
           />
-          <Route path="/leave" element={<Leave />} />
+          <Route path="/leave" element={<LeaveRoute />} />
           <Route path="/leave/:employeeId" element={<LeaveDetails />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/" element={<Navigate to="/home" replace />} />

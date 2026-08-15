@@ -69,12 +69,14 @@ export const navigationGroups: NavGroup[] = [
         path: "/attendance",
         icon: CalendarCheck,
         employeeLabel: "My Attendance",
+        roles: ["Admin", "Manager", "Employee"],
       },
       {
         label: "Leave Management",
         path: "/leave",
         icon: CalendarDays,
         employeeLabel: "My Leave",
+        roles: ["Admin", "Manager", "Employee"],
       },
       {
         label: "Performance",

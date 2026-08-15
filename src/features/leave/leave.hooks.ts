@@ -1,11 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../../api/user.api";
+import type { CreateLeaveRequest } from "../../api/user.api";
 import { toast } from "react-toastify";
 
 export const useLeaveRequests = () => {
   return useQuery({
     queryKey: ["leave"],
     queryFn: () => userApi.getLeaveRequests().then((response) => response.data),
+  });
+};
+
+export const useMyLeave = () => {
+  return useQuery({
+    queryKey: ["my-leave"],
+    queryFn: () => userApi.getLeaveRequests().then((response) => response.data),
+  });
+};
+
+export const useCreateLeave = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateLeaveRequest) =>
+      userApi.createLeaveRequest(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-leave"] });
+      toast.success("Leave request submitted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to submit leave request");
+    },
   });
 };
 

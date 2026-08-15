@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { userApi } from "../../api/user.api";
 import type {
   AttendancePeriod,
@@ -18,6 +19,57 @@ export const useAttendance = () => {
   return useQuery({
     queryKey: ["attendance"],
     queryFn: () => userApi.getAttendance().then((response) => response.data),
+  });
+};
+
+export const useMyAttendance = () => {
+  return useQuery({
+    queryKey: ["my-attendance"],
+    queryFn: () =>
+      userApi.getMyAttendance().then((response) => response.data),
+  });
+};
+
+export const useMyAttendanceSummary = () => {
+  return useQuery({
+    queryKey: ["my-attendance-summary"],
+    queryFn: () =>
+      userApi.getMyAttendanceSummary().then((response) => response.data),
+  });
+};
+
+const invalidateMyAttendance = (queryClient: ReturnType<typeof useQueryClient>) => {
+  queryClient.invalidateQueries({ queryKey: ["my-attendance"] });
+  queryClient.invalidateQueries({ queryKey: ["my-attendance-summary"] });
+};
+
+export const useCheckIn = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => userApi.checkIn(),
+    onSuccess: () => {
+      invalidateMyAttendance(queryClient);
+      toast.success("Checked in successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to check in");
+    },
+  });
+};
+
+export const useCheckOut = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => userApi.checkOut(),
+    onSuccess: () => {
+      invalidateMyAttendance(queryClient);
+      toast.success("Checked out successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to check out");
+    },
   });
 };
 

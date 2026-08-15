@@ -553,6 +553,18 @@ export interface AttendanceRecord {
   checkIn: string;
   checkOut: string;
   isPresent: boolean;
+  status?: string | null;
+}
+
+export interface MyAttendanceSummary {
+  employeeId: number;
+  employeeName: string;
+  totalWorkingDays: number;
+  present: number;
+  absent: number;
+  leave: number;
+  late: number;
+  attendanceRate: number;
 }
 
 export interface PerformanceReview {
@@ -607,6 +619,12 @@ export interface LeaveRequest {
   startDate: string;
   endDate: string;
   status: LeaveStatus;
+}
+
+export interface CreateLeaveRequest {
+  reason: string;
+  startDate: string;
+  endDate: string;
 }
 
 export interface ManagerEmployee {
@@ -777,17 +795,24 @@ export const userApi = {
       params,
     }),
   getAttendance: () => api.get<AttendanceRecord[]>("/attendance"),
+  getMyAttendance: () =>
+    api.get<AttendanceRecord[]>("/attendance/my-attendance"),
+  getMyAttendanceSummary: () =>
+    api.get<MyAttendanceSummary>("/attendance/my-attendance/summary"),
+  checkIn: () => api.post<AttendanceRecord>("/attendance/check-in"),
+  checkOut: () => api.post<AttendanceRecord>("/attendance/check-out"),
   getAttendanceByEmployeeId: (employeeId: string) =>
     api.get<AttendanceRecord[]>(`/attendance/${employeeId}`),
   getLeaveRequests: () => api.get<LeaveRequest[]>("/leave"),
   getLeaveByEmployeeId: (employeeId: string) =>
     api.get<LeaveRequest[]>(`/leave/${employeeId}`),
+  createLeaveRequest: (data: CreateLeaveRequest) =>
+    api.post<LeaveRequest>("/leave", data),
   approveLeave: (leaveId: string) =>
     api.patch<LeaveRequest>(`/leave/${leaveId}/approve`),
   rejectLeave: (leaveId: string) =>
     api.patch<LeaveRequest>(`/leave/${leaveId}/reject`),
-  getPerformanceReviews: () =>
-    api.get<PerformanceReview[]>("/performance"),
+  getPerformanceReviews: () => api.get<PerformanceReview[]>("/performance"),
   createPerformanceReview: (data: CreatePerformanceRequest) =>
     api.post<PerformanceReview>("/performance", data),
   updatePerformanceReview: (
@@ -852,12 +877,9 @@ export const userApi = {
   getUserById: (id: string | number) => api.get<User>(`/users/${id}`),
   updateUserById: (id: string | number, data: UpdateUserByIdRequest) =>
     api.patch<User>(`/users/${id}`, data),
-  resetUserPassword: (
-    id: string | number,
-    data: ChangePasswordRequest,
-  ) => api.patch<User>(`/users/${id}/password`, data),
-  deleteUser: (id: string | number) =>
-    api.delete<User>(`/users/${id}`),
+  resetUserPassword: (id: string | number, data: ChangePasswordRequest) =>
+    api.patch<User>(`/users/${id}/password`, data),
+  deleteUser: (id: string | number) => api.delete<User>(`/users/${id}`),
   activateUser: (id: string | number) =>
     api.patch<User>(`/users/${id}/activate`),
   deactivateUser: (id: string | number) =>
@@ -871,8 +893,7 @@ export const userApi = {
     api.post<Department>("/department", { name }),
   updateDepartment: (id: string, name: string) =>
     api.put<Department>(`/department/${id}`, { name }),
-  deleteDepartment: (id: string) =>
-    api.delete<Department>(`/department/${id}`),
+  deleteDepartment: (id: string) => api.delete<Department>(`/department/${id}`),
   assignEmployeesToDepartment: (id: string, employeeIds: string[]) =>
     api.post<Department>(`/department/${id}/assign-employees`, {
       employeeIds,
@@ -883,7 +904,8 @@ export const userApi = {
   getEmployeeById: (id: string) => api.get<EmployeeDetail>(`/employees/${id}`),
   updateEmployee: (id: string, data: Partial<UpdateEmployeeRequest>) =>
     api.put<EmployeeDetail>(`/employees/${id}`, data),
-  deleteEmployee: (id: string) => api.delete<EmployeeDetail>(`/employees/${id}`),
+  deleteEmployee: (id: string) =>
+    api.delete<EmployeeDetail>(`/employees/${id}`),
   assignDepartment: (id: string, departmentId: string) =>
     api.post<EmployeeDetail>(`/employees/${id}/assign-department`, {
       departmentId,
@@ -909,10 +931,8 @@ export const userApi = {
   uploadMyProfilePicture: (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    return api.post<EmployeeDetail>(
-      "/employees/me/profile-picture",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
+    return api.post<EmployeeDetail>("/employees/me/profile-picture", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 };
