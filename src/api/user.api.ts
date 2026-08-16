@@ -666,7 +666,8 @@ export interface PerformanceReview {
     profilePicture: string | null;
     createdAt: string;
   };
-  reviewer: string;
+  reviewerName: string;
+  reviewerRole: string;
   feedback: string;
   rating: number;
   reviewDate: string;
@@ -1000,6 +1001,24 @@ export const userApi = {
     api.delete<{ message: string }>(`/manager/employees/${id}`),
   updateManagerEmployeeStatus: (id: string | number, isActive: boolean) =>
     api.patch<EmployeeDetail>(`/manager/employees/${id}/status`, { isActive }),
+  getManagerAttendance: () =>
+    api.get<AttendanceRecord[]>("/manager/attendance"),
+  getManagerEmployeeAttendance: (employeeId: string | number) =>
+    api.get<AttendanceRecord[]>(`/manager/attendance/${employeeId}`),
+  getManagerLeaveRequests: () =>
+    api.get<LeaveRequest[]>("/manager/leaves"),
+  getManagerLeaveById: (leaveId: string | number) =>
+    api.get<LeaveRequest>(`/manager/leaves/${leaveId}`),
+  approveManagerLeave: (leaveId: string) =>
+    api.patch<LeaveRequest>(`/manager/leaves/${leaveId}/approve`),
+  rejectManagerLeave: (leaveId: string) =>
+    api.patch<LeaveRequest>(`/manager/leaves/${leaveId}/reject`),
+  getManagerPerformanceReviews: () =>
+    api.get<PerformanceReview[]>("/manager/performance"),
+  createManagerPerformanceReview: (data: CreatePerformanceRequest) =>
+    api.post<PerformanceReview>("/manager/performance", data),
+  getManagerPerformanceByEmployeeId: (employeeId: string | number) =>
+    api.get<PerformanceReview[]>(`/manager/performance/${employeeId}`),
   createEmployee: (data: UpdateEmployeeRequest) =>
     api.post<EmployeeDetail>("/employees", data),
   getEmployeeById: (id: string) => api.get<EmployeeDetail>(`/employees/${id}`),

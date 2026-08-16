@@ -41,6 +41,7 @@ export const useMyAttendanceSummary = () => {
 const invalidateMyAttendance = (queryClient: ReturnType<typeof useQueryClient>) => {
   queryClient.invalidateQueries({ queryKey: ["my-attendance"] });
   queryClient.invalidateQueries({ queryKey: ["my-attendance-summary"] });
+  queryClient.invalidateQueries({ queryKey: ["manager-attendance"] });
 };
 
 export const useCheckIn = () => {
@@ -138,6 +139,27 @@ export const useAttendanceByEmployee = (employeeId: string | undefined) => {
     queryFn: () =>
       userApi
         .getAttendanceByEmployeeId(employeeId as string)
+        .then((response) => response.data),
+    enabled: Boolean(employeeId),
+  });
+};
+
+export const useManagerAttendance = () => {
+  return useQuery({
+    queryKey: ["manager-attendance"],
+    queryFn: () =>
+      userApi.getManagerAttendance().then((response) => response.data),
+  });
+};
+
+export const useManagerEmployeeAttendance = (
+  employeeId: string | undefined,
+) => {
+  return useQuery({
+    queryKey: ["manager-attendance", "employee", employeeId],
+    queryFn: () =>
+      userApi
+        .getManagerEmployeeAttendance(employeeId as string)
         .then((response) => response.data),
     enabled: Boolean(employeeId),
   });

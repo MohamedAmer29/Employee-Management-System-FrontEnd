@@ -14,6 +14,11 @@ import Employees from "../pages/Employees";
 import EmployeeDetails from "../pages/EmployeeDetails";
 import ManagerEmployees from "../pages/manager/ManagerEmployees";
 import ManagerEmployeeDetails from "../pages/manager/ManagerEmployeeDetails";
+import ManagerAttendance from "../pages/manager/ManagerAttendance";
+import ManagerAttendanceEmployee from "../pages/manager/ManagerAttendanceEmployee";
+import ManagerLeave from "../pages/manager/ManagerLeave";
+import ManagerLeaveDetails from "../pages/manager/ManagerLeaveDetails";
+import ManagerPerformance from "../pages/manager/ManagerPerformance";
 import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
@@ -79,7 +84,21 @@ const AttendanceRoute = () => {
     return <MyAttendance />;
   }
 
+  if (role === "Manager") {
+    return <ManagerAttendance />;
+  }
+
   return <Attendance />;
+};
+
+const AttendanceDetailsRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Manager") {
+    return <ManagerAttendanceEmployee />;
+  }
+
+  return <AttendanceDetails />;
 };
 
 const EmployeesRoute = () => {
@@ -109,7 +128,31 @@ const LeaveRoute = () => {
     return <MyLeave />;
   }
 
+  if (role === "Manager") {
+    return <ManagerLeave />;
+  }
+
   return <Leave />;
+};
+
+const LeaveDetailsRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Manager") {
+    return <ManagerLeaveDetails />;
+  }
+
+  return <LeaveDetails />;
+};
+
+const PerformanceRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Manager") {
+    return <ManagerPerformance />;
+  }
+
+  return <Performance />;
 };
 
 const AppRoutes = () => {
@@ -169,7 +212,7 @@ const AppRoutes = () => {
           <Route path="/attendance/today" element={<TodayAttendance />} />
           <Route path="/attendance/monthly" element={<MonthlyAttendance />} />
           <Route path="/attendance/absent" element={<AbsentAttendance />} />
-          <Route path="/attendance/:employeeId" element={<AttendanceDetails />} />
+          <Route path="/attendance/:employeeId" element={<AttendanceDetailsRoute />} />
           <Route
             path="/users"
             element={
@@ -187,8 +230,8 @@ const AppRoutes = () => {
             }
           />
           <Route path="/leave" element={<LeaveRoute />} />
-          <Route path="/leave/:employeeId" element={<LeaveDetails />} />
-          <Route path="/performance" element={<Performance />} />
+          <Route path="/leave/:employeeId" element={<LeaveDetailsRoute />} />
+          <Route path="/performance" element={<PerformanceRoute />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

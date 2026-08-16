@@ -18,12 +18,14 @@ import {
   UserCheck,
   UserX,
   Loader2,
+  ZoomIn,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Avatar from "@/components/common/Avatar";
+import ImageLightbox from "@/components/common/ImageLightbox";
 import EditEmployeeModal from "@/components/managerEmployees/EditEmployeeModal";
 import DeleteEmployeeModal from "@/components/managerEmployees/DeleteEmployeeModal";
 import StatusEmployeeModal from "@/components/managerEmployees/StatusEmployeeModal";
@@ -90,6 +92,7 @@ const ManagerEmployeeDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isConfirmingStatus, setIsConfirmingStatus] = useState(false);
+  const [isImageZoomOpen, setIsImageZoomOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -198,6 +201,17 @@ const ManagerEmployeeDetails = () => {
                 className="rounded-full"
               />
             </div>
+            {profileImageUrl && (
+              <button
+                type="button"
+                onClick={() => setIsImageZoomOpen(true)}
+                title="View larger"
+                aria-label="View larger profile picture"
+                className="absolute -bottom-2 -right-2 flex items-center justify-center h-11 w-11 rounded-full bg-white dark:bg-dark-surface shadow-lg ring-2 ring-white/60 dark:ring-dark-surface text-gray-700 dark:text-gray-200 hover:bg-primary hover:text-white transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <ZoomIn className="w-5 h-5" aria-hidden="true" />
+              </button>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50 truncate flex items-center justify-center gap-2">
@@ -387,6 +401,14 @@ const ManagerEmployeeDetails = () => {
           <Loader2 className="w-4 h-4 animate-spin" />
           Working...
         </div>
+      )}
+
+      {isImageZoomOpen && (
+        <ImageLightbox
+          src={profileImageUrl}
+          alt={`${employee.fullName} profile picture`}
+          onClose={() => setIsImageZoomOpen(false)}
+        />
       )}
     </div>
   );

@@ -73,3 +73,52 @@ export const useRejectLeave = () => {
     },
   });
 };
+
+export const useManagerLeaveRequests = () => {
+  return useQuery({
+    queryKey: ["manager-leave"],
+    queryFn: () =>
+      userApi.getManagerLeaveRequests().then((response) => response.data),
+  });
+};
+
+export const useManagerLeaveById = (leaveId: string | undefined) => {
+  return useQuery({
+    queryKey: ["manager-leave", leaveId],
+    queryFn: () =>
+      userApi
+        .getManagerLeaveById(leaveId as string)
+        .then((response) => response.data),
+    enabled: Boolean(leaveId),
+  });
+};
+
+export const useManagerApproveLeave = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (leaveId: string) => userApi.approveManagerLeave(leaveId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["manager-leave"] });
+      toast.success("Leave request approved successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to approve leave request");
+    },
+  });
+};
+
+export const useManagerRejectLeave = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (leaveId: string) => userApi.rejectManagerLeave(leaveId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["manager-leave"] });
+      toast.success("Leave request rejected successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to reject leave request");
+    },
+  });
+};
