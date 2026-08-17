@@ -11,10 +11,10 @@ import {
   User,
   Building2,
   FileText,
-  Ban,
-  ClockAlert,
   Play,
   Loader2,
+  Ban,
+  ClockAlert,
 } from "lucide-react";
 import { useMyTasks, useUpdateTaskStatus } from "@/features/tasks/tasks.hooks";
 import type { Task, TaskStatus, TaskPriority } from "@/api/user.api";
@@ -362,40 +362,6 @@ const EmployeeTasks = () => {
                         <Play className="w-3 h-3" aria-hidden="true" />
                       )}
                       {task.status === "TODO" ? "Start" : "Mark Done"}
-                    </button>
-                  )}
-                  {task.status !== "CANCELLED" && task.status !== "COMPLETED" && task.status !== "OVERDUE" && (
-                    <button
-                      type="button"
-                      disabled={isStatusUpdating}
-                      onClick={() =>
-                        updateStatus({ taskId: task.id, status: "CANCELLED" })
-                      }
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
-                    >
-                      {isStatusUpdating ? (
-                        <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Ban className="w-3 h-3" aria-hidden="true" />
-                      )}
-                      Cancel
-                    </button>
-                  )}
-                  {task.status !== "OVERDUE" && task.status !== "COMPLETED" && task.status !== "CANCELLED" && (
-                    <button
-                      type="button"
-                      disabled={isStatusUpdating}
-                      onClick={() =>
-                        updateStatus({ taskId: task.id, status: "OVERDUE" })
-                      }
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                    >
-                      {isStatusUpdating ? (
-                        <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <ClockAlert className="w-3 h-3" aria-hidden="true" />
-                      )}
-                      Overdue
                     </button>
                   )}
                   {(task.status === "COMPLETED" || task.status === "CANCELLED" || task.status === "OVERDUE") && (

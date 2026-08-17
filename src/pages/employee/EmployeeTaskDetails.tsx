@@ -167,7 +167,7 @@ const EmployeeTaskDetails = () => {
             )}
           </div>
         </div>
-        {task.status !== "COMPLETED" && (
+        {task.status !== "COMPLETED" && task.status !== "CANCELLED" && task.status !== "OVERDUE" && (
           <button
             type="button"
             disabled={isStatusUpdating}
@@ -186,6 +186,14 @@ const EmployeeTaskDetails = () => {
             )}
             {task.status === "TODO" ? "Start Task" : "Mark Done"}
           </button>
+        )}
+        {(task.status === "COMPLETED" || task.status === "CANCELLED" || task.status === "OVERDUE") && (
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${statusCfg.className}`}
+          >
+            <statusCfg.icon className="w-4 h-4" aria-hidden="true" />
+            {statusCfg.label}
+          </span>
         )}
       </div>
 
