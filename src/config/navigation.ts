@@ -12,6 +12,7 @@ import {
   Settings,
   UserCheck,
   ShieldCheck,
+  ListTodo,
 } from "lucide-react";
 
 export type UserRole = "Admin" | "Manager" | "Employee";
@@ -58,6 +59,13 @@ export const navigationGroups: NavGroup[] = [
         path: "/departments",
         icon: Building2,
         roles: ["Admin"],
+      },
+      {
+        label: "Tasks",
+        path: "/tasks",
+        icon: ListTodo,
+        employeeLabel: "My Tasks",
+        roles: ["Admin", "Manager", "Employee"],
       },
     ],
   },

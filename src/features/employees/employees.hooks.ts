@@ -10,11 +10,12 @@ import type {
   UpdateManagerEmployeeRequest,
 } from "../../api/user.api";
 
-export const useEmployees = () => {
+export const useEmployees = (enabled = true) => {
   return useQuery({
     queryKey: ["employees"],
     queryFn: () =>
       userApi.getEmployees().then((response) => response.data),
+    enabled,
   });
 };
 
@@ -204,11 +205,15 @@ export const useUpdateEmployee = () => {
   });
 };
 
-export const useManagerEmployees = (params?: ManagerEmployeeParams) => {
+export const useManagerEmployees = (
+  params?: ManagerEmployeeParams,
+  enabled = true,
+) => {
   return useQuery({
     queryKey: ["managerEmployees", params],
     queryFn: () =>
       userApi.getManagerEmployees(params).then((response) => response.data),
+    enabled,
   });
 };
 

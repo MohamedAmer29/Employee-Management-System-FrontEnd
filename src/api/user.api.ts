@@ -687,6 +687,93 @@ export interface CreatePerformanceRequest {
   reviewDate: string;
 }
 
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "OVERDUE";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+
+export interface TaskEmployee {
+  id: number;
+  fullName: string;
+  email: string;
+  position: string;
+  role: string;
+  isActive: boolean;
+  department: { id: number; name: string } | null;
+  profilePicture: string | null;
+  userId: number;
+}
+
+export interface TaskManager {
+  id: number;
+  fullName: string;
+  email: string;
+}
+
+export interface TaskDepartment {
+  id: number;
+  name: string;
+}
+
+export interface TaskCreatedBy {
+  id: number;
+  fullName: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  assignedEmployee: TaskEmployee | null;
+  assignedManager: TaskManager | null;
+  department: TaskDepartment | null;
+  createdBy: TaskCreatedBy;
+}
+
+export interface TasksResponse {
+  data: Task[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface TaskParams {
+  page?: number;
+  limit?: number;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  employeeId?: string;
+  managerId?: string;
+  departmentId?: string;
+  createdById?: string;
+  dueDate?: string;
+  search?: string;
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  description: string;
+  employeeId: string;
+  managerId: string;
+  priority: TaskPriority;
+  dueDate: string;
+}
+
+export interface UpdateTaskRequest {
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  dueDate: string;
+}
+
 export type LeaveStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 export interface LeaveRequest {
@@ -1055,4 +1142,15 @@ export const userApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  getTasks: (params?: TaskParams) =>
+    api.get<TasksResponse>("/tasks", { params }),
+  getTaskById: (taskId: string) => api.get<Task>(`/tasks/${taskId}`),
+  createTask: (data: CreateTaskRequest) => api.post<Task>("/tasks", data),
+  getMyTasks: () => api.get<Task[]>("/tasks/my"),
+  updateTask: (taskId: string, data: UpdateTaskRequest) =>
+    api.patch<Task>(`/tasks/${taskId}`, data),
+  updateTaskStatus: (taskId: string, status: TaskStatus) =>
+    api.patch<Task>(`/tasks/${taskId}/status`, { status }),
+  deleteTask: (taskId: string) =>
+    api.delete<{ message: string }>(`/tasks/${taskId}`),
 };

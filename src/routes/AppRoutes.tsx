@@ -19,11 +19,15 @@ import ManagerAttendanceEmployee from "../pages/manager/ManagerAttendanceEmploye
 import ManagerLeave from "../pages/manager/ManagerLeave";
 import ManagerLeaveDetails from "../pages/manager/ManagerLeaveDetails";
 import ManagerPerformance from "../pages/manager/ManagerPerformance";
+import ManagerTasks from "../pages/manager/ManagerTasks";
+import ManagerTaskDetails from "../pages/manager/ManagerTaskDetails";
 import Departments from "../pages/Departments";
 import DepartmentDetails from "../pages/DepartmentDetails";
 import Attendance from "../pages/Attendance";
 import MyAttendance from "../pages/employee/MyAttendance";
 import MyLeave from "../pages/employee/MyLeave";
+import EmployeeTasks from "../pages/employee/EmployeeTasks";
+import EmployeeTaskDetails from "../pages/employee/EmployeeTaskDetails";
 import AttendanceDetails from "../pages/AttendanceDetails";
 import TodayAttendance from "../pages/TodayAttendance";
 import MonthlyAttendance from "../pages/MonthlyAttendance";
@@ -155,6 +159,34 @@ const PerformanceRoute = () => {
   return <Performance />;
 };
 
+const TasksRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Employee") {
+    return <EmployeeTasks />;
+  }
+
+  if (role === "Admin" || role === "Manager") {
+    return <ManagerTasks />;
+  }
+
+  return <Navigate to="/home" replace />;
+};
+
+const TaskDetailsRoute = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  if (role === "Employee") {
+    return <EmployeeTaskDetails />;
+  }
+
+  if (role === "Admin" || role === "Manager") {
+    return <ManagerTaskDetails />;
+  }
+
+  return <Navigate to="/home" replace />;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -232,6 +264,8 @@ const AppRoutes = () => {
           <Route path="/leave" element={<LeaveRoute />} />
           <Route path="/leave/:employeeId" element={<LeaveDetailsRoute />} />
           <Route path="/performance" element={<PerformanceRoute />} />
+          <Route path="/tasks" element={<TasksRoute />} />
+          <Route path="/tasks/:id" element={<TaskDetailsRoute />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>
