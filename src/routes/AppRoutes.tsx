@@ -35,6 +35,11 @@ import AbsentAttendance from "../pages/AbsentAttendance";
 import Leave from "../pages/Leave";
 import LeaveDetails from "../pages/LeaveDetails";
 import Performance from "../pages/Performance";
+import AdminPayroll from "../pages/admin/AdminPayroll";
+import AdminPayrollDetails from "../pages/admin/AdminPayrollDetails";
+import AdminPayrollEmployee from "../pages/admin/AdminPayrollEmployee";
+import AdminPayrollManager from "../pages/admin/AdminPayrollManager";
+import AdminPayrollMonthly from "../pages/admin/AdminPayrollMonthly";
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullPageLoader from "../components/common/FullPageLoader";
 import type { RootState } from "../store/store";
@@ -266,6 +271,11 @@ const AppRoutes = () => {
           <Route path="/performance" element={<PerformanceRoute />} />
           <Route path="/tasks" element={<TasksRoute />} />
           <Route path="/tasks/:id" element={<TaskDetailsRoute />} />
+          <Route path="/payroll" element={<AdminPayroll />} />
+          <Route path="/payroll/monthly" element={<AdminPayrollMonthly />} />
+          <Route path="/payroll/:id" element={<AdminPayrollDetails />} />
+          <Route path="/payroll/employee/:employeeId" element={<AdminPayrollEmployee />} />
+          <Route path="/payroll/manager/:managerId" element={<AdminPayrollManager />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
       </Route>

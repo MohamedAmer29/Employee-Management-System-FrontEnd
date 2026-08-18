@@ -941,6 +941,107 @@ export interface CreateAdminRequest {
   departmentId: string;
 }
 
+export type PayrollStatus = "DRAFT" | "CALCULATED" | "APPROVED" | "PAID";
+
+export interface PayrollEmployee {
+  id: number;
+  fullName: string;
+  email: string;
+  position: string;
+  role: string;
+  isActive: boolean;
+  department: { id: number; name: string };
+  profilePicture: string | null;
+  userId: number;
+}
+
+export interface PayrollManager {
+  id: number;
+  fullName: string;
+  email: string;
+  position: string;
+  role: string;
+  isActive: boolean;
+  department: { id: number; name: string };
+  profilePicture: string | null;
+  userId: number;
+}
+
+export interface PayrollRecord {
+  id: string;
+  month: number;
+  year: number;
+  baseSalary: number;
+  workingDays: number;
+  attendedDays: number;
+  absentDays: number;
+  leaveDays: number;
+  dailySalary: number;
+  attendanceDeduction: number;
+  totalDeductions: number;
+  totalBonuses: number;
+  netSalary: number;
+  status: PayrollStatus;
+  employee: PayrollEmployee | null;
+  manager: PayrollManager | null;
+  deductions: PayrollEntry[];
+  bonuses: PayrollEntry[];
+  createdBy: { id: number; fullName: string } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PayrollListResponse {
+  data: PayrollRecord[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface PayrollParams {
+  page?: number;
+  limit?: number;
+  month?: number;
+  year?: number;
+  status?: PayrollStatus;
+  employeeId?: string;
+  managerId?: string;
+  search?: string;
+}
+
+export interface CalculateSalaryRequest {
+  month: number;
+  year: number;
+  baseSalary: number;
+  workingDays: number;
+}
+
+export type DeductionType = "ABSENCE" | "LATE" | "UNPAID_LEAVE" | "DISCIPLINARY" | "OTHER";
+export type BonusType = "PERFORMANCE" | "OVERTIME" | "HOLIDAY" | "REFERRAL" | "OTHER";
+
+export interface PayrollDeductionRequest {
+  amount: number;
+  type: DeductionType;
+  reason: string;
+}
+
+export interface PayrollBonusRequest {
+  amount: number;
+  type: BonusType;
+  reason: string;
+}
+
+export interface PayrollEntry {
+  id: number;
+  amount: number;
+  type: string;
+  reason: string;
+  createdAt: string;
+}
+
 export const userApi = {
   getCurrentUser: (token: string) =>
     api.post<CurrentUser>("/auth/current-user", { token }),
@@ -1153,4 +1254,28 @@ export const userApi = {
     api.patch<Task>(`/tasks/${taskId}/status`, { status }),
   deleteTask: (taskId: string) =>
     api.delete<{ message: string }>(`/tasks/${taskId}`),
+
+  // Payroll
+  getPayroll: (params?: PayrollParams) =>
+    api.get<PayrollListResponse>("/admin/payroll", { params }),
+  getPayrollRecord: (payrollId: string) =>
+    api.get<PayrollRecord>(`/admin/payroll/${payrollId}`),
+  getPayrollEmployee: (employeeId: string, params?: PayrollParams) =>
+    api.get<PayrollRecord[]>(`/admin/payroll/employee/${employeeId}`, { params }),
+  getPayrollManager: (managerId: string, params?: PayrollParams) =>
+    api.get<PayrollRecord[]>(`/admin/payroll/manager/${managerId}`, { params }),
+  getPayrollMonthly: (params?: PayrollParams) =>
+    api.get<PayrollListResponse>("/admin/payroll/monthly", { params }),
+  calculateEmployeeSalary: (employeeId: string, data: CalculateSalaryRequest) =>
+    api.post<PayrollRecord>(`/admin/payroll/employee/${employeeId}/calculate`, data),
+  calculateManagerSalary: (managerId: string, data: CalculateSalaryRequest) =>
+    api.post<PayrollRecord>(`/admin/payroll/manager/${managerId}/calculate`, data),
+  addDeduction: (payrollId: string, data: PayrollDeductionRequest) =>
+    api.post<PayrollRecord>(`/admin/payroll/${payrollId}/deductions`, data),
+  addBonus: (payrollId: string, data: PayrollBonusRequest) =>
+    api.post<PayrollRecord>(`/admin/payroll/${payrollId}/bonuses`, data),
+  approvePayroll: (payrollId: string) =>
+    api.patch<PayrollRecord>(`/admin/payroll/${payrollId}/approve`),
+  markPayrollPaid: (payrollId: string) =>
+    api.patch<PayrollRecord>(`/admin/payroll/${payrollId}/mark-paid`),
 };

@@ -13,6 +13,7 @@ import {
   UserCheck,
   ShieldCheck,
   ListTodo,
+  DollarSign,
 } from "lucide-react";
 
 export type UserRole = "Admin" | "Manager" | "Employee";
@@ -42,6 +43,19 @@ export const navigationGroups: NavGroup[] = [
         icon: Users,
         roles: ["Admin", "Manager"],
       },
+
+      {
+        label: "Tasks",
+        path: "/tasks",
+        icon: ListTodo,
+        employeeLabel: "My Tasks",
+        roles: ["Admin", "Manager", "Employee"],
+      },
+    ],
+  },
+  {
+    title: "Management",
+    items: [
       {
         label: "Managers",
         path: "/managers",
@@ -60,18 +74,7 @@ export const navigationGroups: NavGroup[] = [
         icon: Building2,
         roles: ["Admin"],
       },
-      {
-        label: "Tasks",
-        path: "/tasks",
-        icon: ListTodo,
-        employeeLabel: "My Tasks",
-        roles: ["Admin", "Manager", "Employee"],
-      },
-    ],
-  },
-  {
-    title: "Management",
-    items: [
+
       {
         label: "Attendance",
         path: "/attendance",
@@ -87,6 +90,12 @@ export const navigationGroups: NavGroup[] = [
         roles: ["Admin", "Manager", "Employee"],
       },
       {
+        label: "Manage Payments",
+        path: "/payroll",
+        icon: DollarSign,
+        roles: ["Admin"],
+      },
+      {
         label: "Performance",
         path: "/performance",
         icon: TrendingUp,
@@ -98,13 +107,13 @@ export const navigationGroups: NavGroup[] = [
   {
     title: "System",
     items: [
-      { label: "Notifications", path: "/notifications", icon: Bell },
       {
         label: "Audit Logs",
         path: "/audit-logs",
         icon: ScrollText,
         roles: ["Admin"],
       },
+      { label: "Notifications", path: "/notifications", icon: Bell },
       { label: "Profile", path: "/profile", icon: User },
       {
         label: "Settings",
