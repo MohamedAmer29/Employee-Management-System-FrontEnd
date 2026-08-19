@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Building2,
   Bell,
+  DollarSign,
   LogIn,
   Ban,
   UserPlus,
@@ -24,9 +25,14 @@ import StatCard from "@/components/dashboard/StatCard";
 import {
   DoughnutChartCard,
   LineChartCard,
+  BarChartCard,
   type ChartItem,
 } from "@/components/dashboard/charts";
 import type { ManagerRecentActivity } from "@/api/user.api";
+import AnimatedNumber from "@/components/common/AnimatedNumber";
+import Reveal from "@/components/motion/Reveal";
+import { RevealChild } from "@/components/motion/RevealChild";
+import SeoHead from "@/components/common/SeoHead";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const ACTIVITIES_PER_PAGE = 7;
@@ -111,7 +117,7 @@ const Panel = ({
   children: ReactNode;
   action?: ReactNode;
 }) => (
-  <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+  <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm card-hover">
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
         {title}
@@ -230,6 +236,59 @@ const ManagerHome = () => {
     [dashboard],
   );
 
+  const payrollStatusItems: ChartItem[] = useMemo(
+    () =>
+      dashboard?.payroll
+        ? [
+            {
+              label: "Pending",
+              value: dashboard.payroll.pendingPayroll,
+              color: "#F59E0B",
+            },
+            {
+              label: "Approved",
+              value: dashboard.payroll.approvedPayroll,
+              color: "#10B981",
+            },
+            {
+              label: "Paid",
+              value: dashboard.payroll.paidPayroll,
+              color: "#0EA5E9",
+            },
+          ]
+        : [],
+    [dashboard],
+  );
+
+  const payrollBreakdownItems: ChartItem[] = useMemo(
+    () =>
+      dashboard?.payroll
+        ? [
+            {
+              label: "Base Salary",
+              value: dashboard.payroll.totalBaseSalary,
+              color: "#3F72AF",
+            },
+            {
+              label: "Deductions",
+              value: dashboard.payroll.totalDeductions,
+              color: "#EF4444",
+            },
+            {
+              label: "Bonuses",
+              value: dashboard.payroll.totalBonuses,
+              color: "#10B981",
+            },
+            {
+              label: "Net Salary",
+              value: dashboard.payroll.totalNetSalary,
+              color: "#8B5CF6",
+            },
+          ]
+        : [],
+    [dashboard],
+  );
+
   const statCards = [
     {
       icon: Users,
@@ -292,36 +351,41 @@ const ManagerHome = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
-          Dashboard
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          An overview of your department's activity.
-        </p>
-      </div>
-
-      <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div
-          className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5"
-          aria-hidden="true"
-        />
-        <div className="relative">
-          <p className="text-sm font-medium text-white/80">Welcome back,</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
-            {displayName} 👋
-          </h2>
-          <p className="text-sm text-white/75 mt-2 max-w-xl">
-            {dashboard
-              ? `Here's what's happening in the ${dashboard.department.name} department today.`
-              : "Here's what's happening in your department today."}
+      <SeoHead title="Manager Dashboard" path="/home" />
+      <Reveal y={25}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
+            Dashboard
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            An overview of your department's activity.
           </p>
         </div>
-      </section>
+      </Reveal>
+
+      <Reveal y={30} delay={0.08}>
+        <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden banner-float">
+          <div
+            className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5"
+            aria-hidden="true"
+          />
+          <div className="relative">
+            <p className="text-sm font-medium text-white/80">Welcome back,</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
+              {displayName} 👋
+            </h2>
+            <p className="text-sm text-white/75 mt-2 max-w-xl">
+              {dashboard
+                ? `Here's what's happening in the ${dashboard.department.name} department today.`
+                : "Here's what's happening in your department today."}
+            </p>
+          </div>
+        </section>
+      </Reveal>
 
       {loadError}
 
@@ -337,18 +401,19 @@ const ManagerHome = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {statCards.map((card) => (
-            <StatCard
-              key={card.label}
-              icon={card.icon}
-              label={card.label}
-              value={card.value}
-              hint={card.hint}
-              accentClass={card.accentClass}
-            />
+            <RevealChild key={card.label}>
+              <StatCard
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+                hint={card.hint}
+                accentClass={card.accentClass}
+              />
+            </RevealChild>
           ))}
-        </div>
+        </Reveal>
       )}
 
       {/* Analytics charts */}
@@ -357,52 +422,75 @@ const ManagerHome = () => {
           Analytics
         </h2>
         {dashboardQuery.isLoading ? (
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
-            role="status"
-            aria-label="Loading charts"
-          >
-            {Array.from({ length: 3 }).map((_, index) => (
-              <ChartSkeleton key={index} />
-            ))}
+          <div className="space-y-4 sm:space-y-5">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
+              role="status"
+              aria-label="Loading charts"
+            >
+              {Array.from({ length: 3 }).map((_, index) => (
+                <ChartSkeleton key={index} />
+              ))}
+            </div>
+            <ChartSkeleton />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <ChartSkeleton />
+              <ChartSkeleton />
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-            <DoughnutChartCard
-              title="Attendance Today"
-              items={attendanceChartItems}
-            />
-            <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
-            <DoughnutChartCard
-              title="Performance Distribution"
-              items={performanceChartItems}
-            />
-          </div>
-        )}
+          <Reveal stagger className="space-y-4 sm:space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              <RevealChild><DoughnutChartCard
+                title="Attendance Today"
+                items={attendanceChartItems}
+              /></RevealChild>
+              <RevealChild><DoughnutChartCard
+                title="Leave Requests"
+                items={leaveChartItems}
+              /></RevealChild>
+              <RevealChild><DoughnutChartCard
+                title="Performance Distribution"
+                items={performanceChartItems}
+              /></RevealChild>
+            </div>
 
-        <Panel title="Attendance Trend">
-          {dashboardQuery.isLoading ? (
-            <div className="h-64 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
-          ) : presentTrend.length > 0 ? (
-            <LineChartCard
-              title="Present vs Absent"
-              series={[
-                { title: "Present", color: "#10B981", items: presentTrend },
-                { title: "Absent", color: "#EF4444", items: absentTrend },
-              ]}
-              pointDelay={50}
-              duration={800}
-            />
-          ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
-              No attendance trend data yet.
-            </p>
-          )}
-        </Panel>
+            {presentTrend.length > 0 ? (
+              <LineChartCard
+                title="Attendance Trend"
+                series={[
+                  { title: "Present", color: "#10B981", items: presentTrend },
+                  { title: "Absent", color: "#EF4444", items: absentTrend },
+                ]}
+                pointDelay={50}
+                duration={800}
+              />
+            ) : (
+              <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+                  No attendance trend data yet.
+                </p>
+              </div>
+            )}
+
+            {dashboard?.payroll && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <DoughnutChartCard
+                  title="Payroll Status"
+                  items={payrollStatusItems}
+                />
+                <BarChartCard
+                  title="Salary Breakdown"
+                  items={payrollBreakdownItems}
+                />
+              </div>
+            )}
+          </Reveal>
+        )}
       </section>
 
       {/* Secondary panels */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+      <Reveal stagger className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
         <div className="xl:col-span-2">
           <Panel title="Recent Activities">
@@ -502,7 +590,7 @@ const ManagerHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.unreadNotifications ?? 0}
+                    <AnimatedNumber value={dashboard?.unreadNotifications ?? 0} />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Unread notifications
@@ -522,18 +610,43 @@ const ManagerHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.attendance.attendanceRate ?? 0}%
+                    <AnimatedNumber value={dashboard?.attendance.attendanceRate ?? 0} suffix="%" />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Today's rate · {dashboard?.attendance.monthlyRate ?? 0}% this
+                    Today's rate · <AnimatedNumber value={dashboard?.attendance.monthlyRate ?? 0} suffix="%" /> this
                     month
                   </p>
                 </div>
               </div>
             )}
           </Panel>
+
+          <Panel title="Payroll Summary">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : dashboard?.payroll ? (
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                  <DollarSign className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+                    $<AnimatedNumber value={dashboard.payroll.totalNetSalary} />
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <AnimatedNumber value={dashboard.payroll.paidPayroll} /> paid ·{" "}
+                    <AnimatedNumber value={dashboard.payroll.pendingPayroll} /> pending
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                No payroll data yet.
+              </p>
+            )}
+          </Panel>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 };

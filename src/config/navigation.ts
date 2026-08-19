@@ -96,6 +96,18 @@ export const navigationGroups: NavGroup[] = [
         roles: ["Admin"],
       },
       {
+        label: "Department Payroll",
+        path: "/manager-payroll",
+        icon: DollarSign,
+        roles: ["Manager"],
+      },
+      {
+        label: "My Payroll",
+        path: "/my-payroll",
+        icon: DollarSign,
+        roles: ["Employee"],
+      },
+      {
         label: "Performance",
         path: "/performance",
         icon: TrendingUp,

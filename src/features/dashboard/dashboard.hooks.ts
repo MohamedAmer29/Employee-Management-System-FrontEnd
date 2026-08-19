@@ -44,3 +44,17 @@ export const useEmployeeDashboard = () => {
     refetchOnWindowFocus: true,
   });
 };
+
+export const useHealthCheck = () => {
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+  return useQuery({
+    queryKey: ["health"],
+    queryFn: () =>
+      userApi.getHealthCheck().then((response) => response.data),
+    enabled: !!accessToken,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+  });
+};

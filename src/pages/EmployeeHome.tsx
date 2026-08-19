@@ -23,9 +23,14 @@ import StatCard from "@/components/dashboard/StatCard";
 import {
   DoughnutChartCard,
   LineChartCard,
+  BarChartCard,
   type ChartItem,
 } from "@/components/dashboard/charts";
 import { AttendanceStatusBadge } from "@/components/attendance/AttendanceStatusBadge";
+import AnimatedNumber from "@/components/common/AnimatedNumber";
+import Reveal from "@/components/motion/Reveal";
+import { RevealChild } from "@/components/motion/RevealChild";
+import SeoHead from "@/components/common/SeoHead";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const formatTime = (time: string | null) => {
@@ -44,7 +49,7 @@ const Panel = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+  <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm card-hover">
     <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
       {title}
     </h2>
@@ -138,6 +143,39 @@ const EmployeeHome = () => {
     [dashboard],
   );
 
+  const payrollStatusItems: ChartItem[] = useMemo(() => {
+    const history = dashboard?.payroll.history ?? [];
+    if (!history.length) return [];
+    const paid = history.filter((r) => r.status === "PAID").length;
+    const calculated = history.filter((r) => r.status === "CALCULATED").length;
+    const draft = history.filter((r) => r.status === "DRAFT").length;
+    const approved = history.filter((r) => r.status === "APPROVED").length;
+    return [
+      { label: "Paid", value: paid, color: "#10B981" },
+      { label: "Calculated", value: calculated, color: "#0EA5E9" },
+      { label: "Draft", value: draft, color: "#F59E0B" },
+      { label: "Approved", value: approved, color: "#8B5CF6" },
+    ];
+  }, [dashboard]);
+
+  const payrollSalaryItems: ChartItem[] = useMemo(() => {
+    const history = dashboard?.payroll.history ?? [];
+    if (!history.length) return [];
+    const grouped: Record<string, number> = {};
+    history.forEach((r) => {
+      const key = `${r.year}-${String(r.month).padStart(2, "0")}`;
+      grouped[key] = (grouped[key] ?? 0) + r.netSalary;
+    });
+    const sorted = Object.entries(grouped)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-6);
+    return sorted.map(([key, value]) => ({
+      label: key,
+      value,
+      color: "#2196F3",
+    }));
+  }, [dashboard]);
+
   const statCards = [
     {
       icon: TrendingUp,
@@ -200,16 +238,18 @@ const EmployeeHome = () => {
 
   return (
     <div className="space-y-6">
-      <div>
+      <SeoHead title="My Dashboard" path="/home" />
+      <Reveal y={25}>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
           My Dashboard
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Your personal attendance and performance overview.
         </p>
-      </div>
+      </Reveal>
 
-      <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+      <Reveal y={30} delay={0.08}>
+        <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden banner-float">
         <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
         <div className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
         <div className="relative flex flex-wrap items-center justify-between gap-4">
@@ -240,6 +280,7 @@ const EmployeeHome = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {loadError}
 
@@ -261,22 +302,23 @@ const EmployeeHome = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {statCards.map((card) => (
-            <StatCard
-              key={card.label}
-              icon={card.icon}
-              label={card.label}
-              value={card.value}
-              hint={card.hint}
-              accentClass={card.accentClass}
-            />
+            <RevealChild key={card.label}>
+              <StatCard
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+                hint={card.hint}
+                accentClass={card.accentClass}
+              />
+            </RevealChild>
           ))}
-        </div>
+        </Reveal>
       )}
 
       {/* Today's check-in / check-out */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         <Panel title="Today's Attendance">
           {dashboardQuery.isLoading ? (
             <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
@@ -359,7 +401,7 @@ const EmployeeHome = () => {
             </div>
           )}
         </Panel>
-      </div>
+      </Reveal>
 
       {dashboardQuery.isLoading ? (
         <div
@@ -378,17 +420,17 @@ const EmployeeHome = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-          <DoughnutChartCard
+        <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+          <RevealChild><DoughnutChartCard
             title="Attendance Today"
             items={attendanceChartItems}
-          />
-          <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
-          <DoughnutChartCard
+          /></RevealChild>
+          <RevealChild><DoughnutChartCard title="Leave Requests" items={leaveChartItems} /></RevealChild>
+          <RevealChild><DoughnutChartCard
             title="Performance Distribution"
             items={performanceChartItems}
-          />
-        </div>
+          /></RevealChild>
+        </Reveal>
       )}
 
       <Panel title="Attendance Trend">
@@ -411,7 +453,20 @@ const EmployeeHome = () => {
         )}
       </Panel>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+      {dashboard?.payroll.history && dashboard.payroll.history.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          <DoughnutChartCard
+            title="Payroll Status"
+            items={payrollStatusItems}
+          />
+          <BarChartCard
+            title="Net Salary by Month"
+            items={payrollSalaryItems}
+          />
+        </div>
+      )}
+
+      <Reveal stagger className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
         <div className="xl:col-span-2">
           <Panel title="Recent Activities">
@@ -465,7 +520,7 @@ const EmployeeHome = () => {
               </span>
               <div>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                  {dashboard?.notifications.unread ?? 0}
+                  <AnimatedNumber value={dashboard?.notifications.unread ?? 0} />
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Unread notifications
@@ -499,7 +554,7 @@ const EmployeeHome = () => {
                   </span>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                      {dashboard.performance.latestReview.rating} / 5
+                      <AnimatedNumber value={dashboard.performance.latestReview.rating} decimals={1} /> / 5
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Reviewed{" "}
@@ -521,7 +576,7 @@ const EmployeeHome = () => {
             )}
           </Panel>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 };

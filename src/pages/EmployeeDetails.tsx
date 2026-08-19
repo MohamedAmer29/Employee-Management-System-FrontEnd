@@ -22,6 +22,7 @@ import {
   UserPlus,
   Camera,
   ZoomIn,
+  ArrowUp,
 } from "lucide-react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -38,6 +39,7 @@ import {
   useAssignDepartment,
   useAssignUser,
   useUploadEmployeeProfilePicture,
+  useMakeManager,
 } from "@/features/employees/employees.hooks";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
@@ -132,12 +134,14 @@ const EmployeeDetails = () => {
   const { data: employee, isLoading, isError, refetch } = useEmployee(id);
   const updateEmployee = useUpdateEmployee();
   const deleteEmployee = useDeleteEmployee();
+  const makeManager = useMakeManager();
   const assignDepartment = useAssignDepartment();
   const assignUser = useAssignUser();
   const uploadProfilePicture = useUploadEmployeeProfilePicture();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isConfirmingPromote, setIsConfirmingPromote] = useState(false);
   const [isAssigningDept, setIsAssigningDept] = useState(false);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState("");
   const [isAssigningUser, setIsAssigningUser] = useState(false);
@@ -269,6 +273,17 @@ const EmployeeDetails = () => {
     }
   };
 
+  const handlePromote = async () => {
+    if (!id) return;
+    try {
+      await makeManager.mutateAsync(id);
+      setIsConfirmingPromote(false);
+      refetch();
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
+
   const handleProfilePictureChange = async (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
@@ -349,6 +364,16 @@ const EmployeeDetails = () => {
             <Network className="w-4 h-4" aria-hidden="true" />
             Assign
           </button>
+          {employee?.role === "Employee" && (
+            <button
+              type="button"
+              onClick={() => setIsConfirmingPromote(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-900/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <ArrowUp className="w-4 h-4" aria-hidden="true" />
+              Promote to Manager
+            </button>
+          )}
           <button
             type="button"
             onClick={openEditModal}
@@ -1115,6 +1140,67 @@ const EmployeeDetails = () => {
                     <>
                       <Trash2 className="w-4 h-4" />
                       Delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmingPromote && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Promote employee to manager"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!makeManager.isPending) setIsConfirmingPromote(false);
+            }}
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-5">
+                <ArrowUp className="w-8 h-8" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">
+                Promote to Manager?
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                This will promote{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {employee?.fullName}
+                </span>{" "}
+                to a Manager role. They will gain management permissions.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmingPromote(false)}
+                  disabled={makeManager.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePromote}
+                  disabled={makeManager.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  {makeManager.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Promoting...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUp className="w-4 h-4" />
+                      Promote
                     </>
                   )}
                 </button>

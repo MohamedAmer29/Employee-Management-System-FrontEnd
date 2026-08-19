@@ -138,6 +138,22 @@ export const useDeleteEmployee = () => {
   });
 };
 
+export const useMakeManager = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => userApi.makeManager(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      toast.success("Employee promoted to manager successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to promote employee");
+    },
+  });
+};
+
 export const useAssignDepartment = () => {
   const queryClient = useQueryClient();
 

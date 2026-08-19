@@ -17,17 +17,22 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/store/store";
 import { useCurrentUser } from "@/features/user/user.hooks";
-import { useAdminDashboard } from "@/features/dashboard/dashboard.hooks";
+import { useAdminDashboard, useHealthCheck } from "@/features/dashboard/dashboard.hooks";
 import EmployeeHome from "@/pages/EmployeeHome";
 import ManagerHome from "@/pages/ManagerHome";
 import FullPageLoader from "@/components/common/FullPageLoader";
 import StatCard from "@/components/dashboard/StatCard";
 import { DoughnutChartCard, BarChartCard } from "@/components/dashboard/charts";
 import type { RecentActivity } from "@/api/user.api";
+import AnimatedNumber from "@/components/common/AnimatedNumber";
+import SeoHead from "@/components/common/SeoHead";
 
 const ACTIVITIES_PER_PAGE = 7;
 
@@ -119,11 +124,42 @@ const Panel = ({
   </section>
 );
 
+const StatusBadge = ({
+  label,
+  status,
+}: {
+  label: string;
+  status: "up" | "down";
+}) => (
+  <div className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-3 py-2">
+    <span
+      className={`h-2 w-2 rounded-full ${
+        status === "up"
+          ? "bg-emerald-500"
+          : "bg-red-500 animate-pulse"
+      }`}
+    />
+    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+      {label}
+    </span>
+    <span
+      className={`ml-auto text-[10px] font-bold uppercase tracking-wider ${
+        status === "up"
+          ? "text-emerald-600 dark:text-emerald-400"
+          : "text-red-600 dark:text-red-400"
+      }`}
+    >
+      {status}
+    </span>
+  </div>
+);
+
 const AdminHome = () => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUserQuery = useCurrentUser();
   const dashboardQuery = useAdminDashboard();
+  const healthQuery = useHealthCheck();
 
   const dashboard = dashboardQuery.data;
   const displayName =
@@ -256,6 +292,7 @@ const AdminHome = () => {
 
   return (
     <div className="space-y-6">
+      <SeoHead title="Dashboard" path="/home" />
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
           Dashboard
@@ -449,7 +486,7 @@ const AdminHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.departments.total ?? 0}
+                    <AnimatedNumber value={dashboard?.departments.total ?? 0} />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Total departments
@@ -469,10 +506,10 @@ const AdminHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.notifications.unread ?? 0}
+                    <AnimatedNumber value={dashboard?.notifications.unread ?? 0} />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Unread · {dashboard?.notifications.total ?? 0} total
+                    Unread · <AnimatedNumber value={dashboard?.notifications.total ?? 0} /> total
                   </p>
                 </div>
               </div>
@@ -489,13 +526,98 @@ const AdminHome = () => {
                 </span>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.attendance.attendanceRate ?? 0}%
+                    <AnimatedNumber value={dashboard?.attendance.attendanceRate ?? 0} suffix="%" />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Today's rate
                   </p>
                 </div>
               </div>
+            )}
+          </Panel>
+
+          <Panel
+            title="System Health"
+            action={
+              <button
+                onClick={() => healthQuery.refetch()}
+                disabled={healthQuery.isFetching}
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                title="Refresh"
+              >
+                <RefreshCw className={`w-4 h-4 ${healthQuery.isFetching ? "animate-spin" : ""}`} />
+              </button>
+            }
+          >
+            {healthQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : healthQuery.isError ? (
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400">
+                  <XCircle className="w-5 h-5" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                    Unreachable
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Could not reach backend
+                  </p>
+                </div>
+              </div>
+            ) : (
+              (() => {
+                const h = healthQuery.data!;
+                const allUp = h.data.database === "up" && h.data.redis === "up";
+                const StatusIcon = h.data.degraded
+                  ? AlertTriangle
+                  : allUp
+                    ? CheckCircle2
+                    : XCircle;
+                const statusColor = h.data.degraded
+                  ? "text-amber-500"
+                  : allUp
+                    ? "text-emerald-500"
+                    : "text-red-500";
+                const statusBg = h.data.degraded
+                  ? "bg-amber-500/10"
+                  : allUp
+                    ? "bg-emerald-500/10"
+                    : "bg-red-500/10";
+                const statusLabel = h.data.degraded
+                  ? "Degraded"
+                  : allUp
+                    ? "All Systems Up"
+                    : "Partial Outage";
+
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className={`flex items-center justify-center h-11 w-11 rounded-xl ${statusBg} ${statusColor}`}>
+                        <StatusIcon className="w-5 h-5" />
+                      </span>
+                      <div>
+                        <p className={`text-sm font-semibold ${statusColor}`}>
+                          {statusLabel}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Redis {h.details.redis.latencyMs}ms
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <StatusBadge
+                        label="Database"
+                        status={h.data.database}
+                      />
+                      <StatusBadge
+                        label="Redis"
+                        status={h.data.redis}
+                      />
+                    </div>
+                  </div>
+                );
+              })()
             )}
           </Panel>
         </div>

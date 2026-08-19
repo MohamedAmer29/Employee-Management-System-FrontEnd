@@ -130,6 +130,16 @@ export interface ManagerDashboard {
       reviewDate: string;
     } | null;
   };
+  payroll: {
+    totalEmployees: number;
+    totalBaseSalary: number;
+    totalDeductions: number;
+    totalBonuses: number;
+    totalNetSalary: number;
+    pendingPayroll: number;
+    approvedPayroll: number;
+    paidPayroll: number;
+  };
   unreadNotifications: number;
   recentActivities: ManagerRecentActivity[];
 }
@@ -175,6 +185,24 @@ export interface EmployeeDashboard {
       feedback: string;
       reviewDate: string;
     } | null;
+  };
+  payroll: {
+    currentMonth: PayrollRecord | null;
+    history: Array<{
+      id: string;
+      month: number;
+      year: number;
+      baseSalary: number;
+      workingDays: number;
+      attendedDays: number;
+      absentDays: number;
+      leaveDays: number;
+      attendanceDeduction: number;
+      totalDeductions: number;
+      bonuses: number;
+      netSalary: number;
+      status: PayrollStatus;
+    }>;
   };
   notifications: {
     unread: number;
@@ -687,7 +715,12 @@ export interface CreatePerformanceRequest {
   reviewDate: string;
 }
 
-export type TaskStatus = "TODO" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "OVERDUE";
+export type TaskStatus =
+  | "TODO"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "OVERDUE";
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 
 export interface TaskEmployee {
@@ -1012,6 +1045,28 @@ export interface PayrollParams {
   search?: string;
 }
 
+export interface ManagerPayrollSummary {
+  totalEmployees: number;
+  totalBaseSalary: number;
+  totalDeductions: number;
+  totalBonuses: number;
+  totalNetSalary: number;
+  pendingPayroll: number;
+  approvedPayroll: number;
+  paidPayroll: number;
+}
+
+export interface ManagerPayrollParams {
+  page?: number;
+  limit?: number;
+  month?: number;
+  year?: number;
+  status?: PayrollStatus;
+  employeeId?: string;
+  managerId?: string;
+  search?: string;
+}
+
 export interface CalculateSalaryRequest {
   month: number;
   year: number;
@@ -1019,8 +1074,18 @@ export interface CalculateSalaryRequest {
   workingDays: number;
 }
 
-export type DeductionType = "ABSENCE" | "LATE" | "UNPAID_LEAVE" | "DISCIPLINARY" | "OTHER";
-export type BonusType = "PERFORMANCE" | "OVERTIME" | "HOLIDAY" | "REFERRAL" | "OTHER";
+export type DeductionType =
+  | "ABSENCE"
+  | "LATE"
+  | "UNPAID_LEAVE"
+  | "DISCIPLINARY"
+  | "OTHER";
+export type BonusType =
+  | "PERFORMANCE"
+  | "OVERTIME"
+  | "HOLIDAY"
+  | "REFERRAL"
+  | "OTHER";
 
 export interface PayrollDeductionRequest {
   amount: number;
@@ -1040,6 +1105,38 @@ export interface PayrollEntry {
   type: string;
   reason: string;
   createdAt: string;
+}
+
+export interface HealthCheckResponse {
+  success: boolean;
+  data: {
+    database: "up" | "down";
+    redis: "up" | "down";
+    degraded: boolean;
+  };
+  details: {
+    redis: {
+      latencyMs: number;
+    };
+  };
+  timestamp: string;
+}
+
+export interface EmployeeCurrentPayroll {
+  exists: boolean;
+  year: number;
+  month: number;
+}
+
+export interface EmployeePayrollParams {
+  page?: number;
+  limit?: number;
+  month?: number;
+  year?: number;
+  status?: PayrollStatus;
+  employeeId?: string;
+  managerId?: string;
+  search?: string;
 }
 
 export const userApi = {
@@ -1193,8 +1290,7 @@ export const userApi = {
     api.get<AttendanceRecord[]>("/manager/attendance"),
   getManagerEmployeeAttendance: (employeeId: string | number) =>
     api.get<AttendanceRecord[]>(`/manager/attendance/${employeeId}`),
-  getManagerLeaveRequests: () =>
-    api.get<LeaveRequest[]>("/manager/leaves"),
+  getManagerLeaveRequests: () => api.get<LeaveRequest[]>("/manager/leaves"),
   getManagerLeaveById: (leaveId: string | number) =>
     api.get<LeaveRequest>(`/manager/leaves/${leaveId}`),
   approveManagerLeave: (leaveId: string) =>
@@ -1214,6 +1310,8 @@ export const userApi = {
     api.put<EmployeeDetail>(`/employees/${id}`, data),
   deleteEmployee: (id: string) =>
     api.delete<EmployeeDetail>(`/employees/${id}`),
+  makeManager: (id: string) =>
+    api.patch<EmployeeDetail>(`/admin/employees/${id}/make-manager`),
   assignDepartment: (id: string, departmentId: string) =>
     api.post<EmployeeDetail>(`/employees/${id}/assign-department`, {
       departmentId,
@@ -1261,15 +1359,23 @@ export const userApi = {
   getPayrollRecord: (payrollId: string) =>
     api.get<PayrollRecord>(`/admin/payroll/${payrollId}`),
   getPayrollEmployee: (employeeId: string, params?: PayrollParams) =>
-    api.get<PayrollRecord[]>(`/admin/payroll/employee/${employeeId}`, { params }),
+    api.get<PayrollRecord[]>(`/admin/payroll/employee/${employeeId}`, {
+      params,
+    }),
   getPayrollManager: (managerId: string, params?: PayrollParams) =>
     api.get<PayrollRecord[]>(`/admin/payroll/manager/${managerId}`, { params }),
   getPayrollMonthly: (params?: PayrollParams) =>
     api.get<PayrollListResponse>("/admin/payroll/monthly", { params }),
   calculateEmployeeSalary: (employeeId: string, data: CalculateSalaryRequest) =>
-    api.post<PayrollRecord>(`/admin/payroll/employee/${employeeId}/calculate`, data),
+    api.post<PayrollRecord>(
+      `/admin/payroll/employee/${employeeId}/calculate`,
+      data,
+    ),
   calculateManagerSalary: (managerId: string, data: CalculateSalaryRequest) =>
-    api.post<PayrollRecord>(`/admin/payroll/manager/${managerId}/calculate`, data),
+    api.post<PayrollRecord>(
+      `/admin/payroll/manager/${managerId}/calculate`,
+      data,
+    ),
   addDeduction: (payrollId: string, data: PayrollDeductionRequest) =>
     api.post<PayrollRecord>(`/admin/payroll/${payrollId}/deductions`, data),
   addBonus: (payrollId: string, data: PayrollBonusRequest) =>
@@ -1278,4 +1384,28 @@ export const userApi = {
     api.patch<PayrollRecord>(`/admin/payroll/${payrollId}/approve`),
   markPayrollPaid: (payrollId: string) =>
     api.patch<PayrollRecord>(`/admin/payroll/${payrollId}/mark-paid`),
+
+  // Manager Payroll
+  getManagerPayrollSummary: (params?: ManagerPayrollParams) =>
+    api.get<ManagerPayrollSummary>("/manager/payroll/summary", { params }),
+  getManagerPayroll: (params?: ManagerPayrollParams) =>
+    api.get<PayrollListResponse>("/manager/payroll", { params }),
+  getManagerPayrollEmployee: (employeeId: string, params?: ManagerPayrollParams) =>
+    api.get<PayrollRecord[]>(`/manager/payroll/${employeeId}`, { params }),
+  getManagerPayrollEmployeeMonthly: (employeeId: string, params?: ManagerPayrollParams) =>
+    api.get<PayrollRecord[]>(`/manager/payroll/${employeeId}/monthly`, { params }),
+
+  // Employee Payroll
+  getEmployeePayroll: (params?: EmployeePayrollParams) =>
+    api.get<PayrollListResponse>("/employee/payroll", { params }),
+  getEmployeePayrollRecord: (payrollId: string) =>
+    api.get<PayrollRecord>(`/employee/payroll/${payrollId}`),
+  getEmployeePayrollHistory: (params?: EmployeePayrollParams) =>
+    api.get<PayrollListResponse>("/employee/payroll/history", { params }),
+  getEmployeeCurrentPayroll: () =>
+    api.get<EmployeeCurrentPayroll>("/employee/payroll/current"),
+
+  // Health Check
+  getHealthCheck: () =>
+    api.get<HealthCheckResponse>("/health"),
 };

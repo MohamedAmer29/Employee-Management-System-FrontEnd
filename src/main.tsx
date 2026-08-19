@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { queryClient } from "./api/queryClient";
@@ -53,14 +54,16 @@ const App = () => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ThemeProvider>
-            <SessionRestore />
-            <SessionMonitor />
-            <AppRoutes />
-            <ThemedToastContainer />
-          </ThemeProvider>
-        </BrowserRouter>
+        <HelmetProvider>
+          <BrowserRouter>
+            <ThemeProvider>
+              <SessionRestore />
+              <SessionMonitor />
+              <AppRoutes />
+              <ThemedToastContainer />
+            </ThemeProvider>
+          </BrowserRouter>
+        </HelmetProvider>
       </QueryClientProvider>
     </Provider>
   );

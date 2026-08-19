@@ -7,9 +7,11 @@ export const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000;
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
+      staleTime: 1000 * 60 * 2,
+      gcTime: 1000 * 60 * 10,
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: "always",
     },
     mutations: {
       retry: 0,

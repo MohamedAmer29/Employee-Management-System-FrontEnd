@@ -19,6 +19,7 @@ import {
   Save,
   ChevronLeft,
   ChevronRight,
+  ArrowUp,
 } from "lucide-react";
 import Avatar from "@/components/common/Avatar";
 import {
@@ -29,6 +30,7 @@ import {
   useCreateEmployee,
   useUsers,
   useUpdateEmployee,
+  useMakeManager,
 } from "@/features/employees/employees.hooks";
 import type { RootState } from "@/store/store";
 import type { UpdateEmployeeRequest, User } from "@/api/user.api";
@@ -73,12 +75,17 @@ const Employees = () => {
   const currentUserEmail = currentUser?.username?.toLowerCase();
   const { data: employees, isLoading, isError, refetch } = useEmployees();
   const deleteEmployee = useDeleteEmployee();
+  const makeManager = useMakeManager();
   const assignDepartment = useAssignDepartment();
   const createEmployee = useCreateEmployee();
   const [deleteTarget, setDeleteTarget] = useState<{
     id: number;
     fullName: string;
     isActive: boolean;
+  } | null>(null);
+  const [promoteTarget, setPromoteTarget] = useState<{
+    id: number;
+    fullName: string;
   } | null>(null);
   const [assignTarget, setAssignTarget] = useState<{
     id: number;
@@ -181,6 +188,16 @@ const Employees = () => {
     try {
       await deleteEmployee.mutateAsync(String(deleteTarget.id));
       setDeleteTarget(null);
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
+
+  const handlePromote = async () => {
+    if (!promoteTarget) return;
+    try {
+      await makeManager.mutateAsync(String(promoteTarget.id));
+      setPromoteTarget(null);
     } catch {
       // Error is handled by the mutation
     }
@@ -541,6 +558,23 @@ const Employees = () => {
                         >
                           <Network className="w-4 h-4" aria-hidden="true" />
                         </button>
+                        {employee.role === "Employee" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPromoteTarget({
+                                id: employee.id,
+                                fullName: employee.fullName,
+                              });
+                            }}
+                            title="Promote to Manager"
+                            aria-label={`Promote ${employee.fullName} to Manager`}
+                            className="flex items-center justify-center h-9 w-9 rounded-lg text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                          >
+                            <ArrowUp className="w-4 h-4" aria-hidden="true" />
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1070,6 +1104,67 @@ const Employees = () => {
                     <>
                       <Trash2 className="w-4 h-4" />
                       Sure
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {promoteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Promote employee to manager"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!makeManager.isPending) setPromoteTarget(null);
+            }}
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-5">
+                <ArrowUp className="w-8 h-8" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">
+                Promote to Manager?
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                This will promote{" "}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {promoteTarget.fullName}
+                </span>{" "}
+                to a Manager role. They will gain management permissions.
+              </p>
+              <div className="flex gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={() => setPromoteTarget(null)}
+                  disabled={makeManager.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePromote}
+                  disabled={makeManager.isPending}
+                  className="flex-1 px-4 py-3 rounded-xl text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  {makeManager.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Promoting...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUp className="w-4 h-4" />
+                      Promote
                     </>
                   )}
                 </button>
