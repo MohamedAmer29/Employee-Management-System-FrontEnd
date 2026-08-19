@@ -70,7 +70,7 @@ export const useUpdateUserById = () => {
       if (variables.id) {
         queryClient.setQueryData(
           ["users", String(variables.id)],
-          response.data,
+          response,
         );
       }
     },
@@ -110,8 +110,8 @@ export const useActivateUser = () => {
         refetchType: "active",
       });
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      if (variables.id) {
-        queryClient.setQueryData(["users", String(variables.id)], response);
+      if (variables) {
+        queryClient.setQueryData(["users", String(variables)], response);
       }
     },
   });
@@ -133,8 +133,8 @@ export const useDeactivateUser = () => {
         refetchType: "active",
       });
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      if (variables.id) {
-        queryClient.setQueryData(["users", String(variables.id)], response);
+      if (variables) {
+        queryClient.setQueryData(["users", String(variables)], response);
       }
     },
   });

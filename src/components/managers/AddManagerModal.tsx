@@ -1,4 +1,3 @@
-import { useState, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { X, Loader2, Save } from "lucide-react";
 import { useCreateManager } from "@/features/managers/managers.hooks";
@@ -22,7 +21,6 @@ const AddManagerModal = ({
     reset,
   } = useForm<CreateManagerRequest>({
     mode: "onBlur",
-    reValidate: "onBlur",
   });
 
   const onSubmit = (data: CreateManagerRequest) => {

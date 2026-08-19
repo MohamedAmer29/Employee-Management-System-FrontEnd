@@ -220,6 +220,7 @@ export interface UpdateUserRequest {
 }
 
 export interface UpdateUserByIdRequest extends UpdateUserRequest {
+  nationalId?: string;
   role?: UserRole;
 }
 

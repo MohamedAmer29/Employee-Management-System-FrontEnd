@@ -67,7 +67,8 @@ const Departments = () => {
     const name = newDepartmentName.trim();
     if (!name) return;
     try {
-      const created = await createDepartment.mutateAsync(name);
+      const response = await createDepartment.mutateAsync(name);
+      const created = response.data ?? response;
       queryClient.setQueryData<Department[]>(
         ["departments"],
         (old = []) => [created, ...old],

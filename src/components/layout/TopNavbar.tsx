@@ -64,7 +64,7 @@ const TopNavbar = ({ onMenuClick }: TopNavbarProps) => {
     : [];
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);
     };
     document.addEventListener("keydown", handleKeyDown);

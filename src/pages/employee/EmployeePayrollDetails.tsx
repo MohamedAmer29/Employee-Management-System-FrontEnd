@@ -6,16 +6,14 @@ import {
   TrendingUp,
   TrendingDown,
   Banknote,
-  CalendarDays,
   Clock,
   CheckCircle2,
   CircleDot,
-  Briefcase,
 } from "lucide-react";
 import { useEmployeePayrollRecord } from "@/features/payroll/payroll.hooks";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { formatDateInUserZone } from "@/utils/formatDate";
-import type { PayrollStatus, PayrollRecord } from "@/api/user.api";
+import type { PayrollStatus } from "@/api/user.api";
 
 const monthNames = [
   "",

@@ -292,14 +292,14 @@ const AuditLogDetails = () => {
           {/* Values diff */}
           {log.oldValues || log.newValues ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {log.oldValues && (
+              {Boolean(log.oldValues) && (
                 <JsonBlock
                   title="Old Values"
                   icon={FileDiff}
                   data={log.oldValues}
                 />
               )}
-              {log.newValues && (
+              {Boolean(log.newValues) && (
                 <JsonBlock
                   title="New Values"
                   icon={FileDiff}

@@ -187,7 +187,7 @@ const EmployeeTaskDetails = () => {
             {task.status === "TODO" ? "Start Task" : "Mark Done"}
           </button>
         )}
-        {(task.status === "COMPLETED" || task.status === "CANCELLED" || task.status === "OVERDUE") && (
+        {statusCfg && (task.status === "COMPLETED" || task.status === "CANCELLED" || task.status === "OVERDUE") && (
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${statusCfg.className}`}
           >

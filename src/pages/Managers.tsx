@@ -24,7 +24,6 @@ import DeleteManagerModal from "@/components/managers/DeleteManagerModal";
 import AddManagerModal from "@/components/managers/AddManagerModal";
 import { useManagers } from "@/features/managers/managers.hooks";
 import { useDepartments } from "@/features/employees/employees.hooks";
-import { useCreateManager } from "@/features/managers/managers.hooks";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
 import type { ManagersParams, Manager } from "@/api/user.api";
@@ -61,7 +60,6 @@ const ManagersPage = () => {
   const [editTarget, setEditTarget] = useState<Manager | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Manager | null>(null);
   const [addTarget, setAddTarget] = useState(false);
-  const createManager = useCreateManager();
 
   const managers = data?.data ?? [];
   const pagination = data?.pagination;

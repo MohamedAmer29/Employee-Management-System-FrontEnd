@@ -69,7 +69,7 @@ const ManagerDetails = () => {
   const activateManagerMutation = useMutation({
     mutationFn: (id: string) => userApi.activateManager(id),
     onSuccess: (_, variables) => {
-      queryClient.setQueryData(["managers", variables.id], (old: any) => {
+      queryClient.setQueryData(["managers", variables], (old: any) => {
         if (!old) return old;
         return { ...old, isActive: true };
       });
@@ -83,7 +83,7 @@ const ManagerDetails = () => {
   const deactivateManagerMutation = useMutation({
     mutationFn: (id: string) => userApi.deactivateManager(id),
     onSuccess: (_, variables) => {
-      queryClient.setQueryData(["managers", variables.id], (old: any) => {
+      queryClient.setQueryData(["managers", variables], (old: any) => {
         if (!old) return old;
         return { ...old, isActive: false };
       });

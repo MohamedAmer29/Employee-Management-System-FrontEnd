@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { X, Loader2, Building2, Save } from "lucide-react";
+import { X, Loader2, Building2 } from "lucide-react";
 import { useAssignManagerToDepartment } from "@/features/managers/managers.hooks";
 import { useDepartments } from "@/features/employees/employees.hooks";
 import type { Manager } from "@/api/user.api";

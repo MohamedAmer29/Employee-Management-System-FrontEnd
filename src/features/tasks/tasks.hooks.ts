@@ -7,6 +7,7 @@ import type {
   TasksResponse,
   CreateTaskRequest,
   UpdateTaskRequest,
+  TaskStatus,
 } from "../../api/user.api";
 
 export const useTasks = (params?: TaskParams) => {
