@@ -5,10 +5,12 @@ import { toast } from "react-toastify";
 import {
   setVerificationEmail,
   clearVerificationData,
+  setResetPasswordEmail,
+  removeResetPasswordEmail,
 } from "../../utils/cookies";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setAuth, setUser, clearUser } from "../../store/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuth, setUser, clearUser, setResetToken, clearResetToken } from "../../store/slices/authSlice";
 
 export const useRegister = () => {
   return useMutation({
@@ -28,13 +30,26 @@ export const useRegister = () => {
 
 export const useVerifyEmail = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: authApi.verifyEmail,
-    onSuccess: () => {
-      toast.success("Email verified successfully!");
+    onSuccess: (response) => {
+      const { user, accessToken } = response.data.data;
+      dispatch(setAuth({ accessToken, user }));
+      toast.success("Email verified successfully! You are now signed in.");
       clearVerificationData();
-      navigate("/login");
+
+      userApi
+        .getCurrentUser(accessToken)
+        .then((res) => {
+          queryClient.setQueryData(["currentUser"], res.data);
+          dispatch(setUser(res.data));
+        })
+        .catch(() => undefined);
+
+      navigate("/home", { replace: true });
     },
     onError: (error) => {
       toast.error(error.message || "Verification failed");
@@ -107,6 +122,62 @@ export const useLogout = () => {
     onError: (error) => {
       toast.error(error.message || "Logout failed");
       handleLogout();
+    },
+  });
+};
+
+export const useForgotPassword = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: authApi.forgotPassword,
+    onSuccess: (_data, variables) => {
+      setResetPasswordEmail(variables.email);
+      toast.success("Reset code sent to your email!");
+      navigate("/reset-otp");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send reset code");
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const resetToken = useSelector(
+    (state: { auth: { resetToken: string | null } }) => state.auth.resetToken,
+  );
+
+  return useMutation({
+    mutationFn: (data: { password: string; confirmPassword: string }) =>
+      authApi.resetPassword(data, resetToken ?? ""),
+    onSuccess: () => {
+      dispatch(clearResetToken());
+      removeResetPasswordEmail();
+      toast.success("Password reset successfully! Please login.");
+      navigate("/login");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to reset password");
+    },
+  });
+};
+
+export const useVerifyResetOtp = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  return useMutation({
+    mutationFn: authApi.verifyResetOtp,
+    onSuccess: (response) => {
+      const { resetToken } = response.data;
+      dispatch(setResetToken(resetToken));
+      toast.success("Code verified! Set your new password.");
+      navigate("/reset-password");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Invalid or expired code");
     },
   });
 };

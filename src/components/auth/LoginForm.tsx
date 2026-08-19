@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLogin } from '../../features/auth/auth.hooks';
 import type { LoginData } from '../../api/auth.api';
 
@@ -121,12 +122,12 @@ const LoginForm = () => {
           />
           <span className="text-sm text-gray-600 dark:text-gray-300">Remember me</span>
         </label>
-        <a
-          href="#"
+        <Link
+          to="/forgot-password"
           className="text-sm text-primary hover:text-primary-dark underline"
         >
           Forgot password?
-        </a>
+        </Link>
       </div>
 
       <button

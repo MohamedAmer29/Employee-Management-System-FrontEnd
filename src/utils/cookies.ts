@@ -4,6 +4,7 @@ export const COOKIE_KEYS = {
   VERIFICATION_EMAIL: 'verification_email',
   RESEND_ATTEMPTS: 'resend_attempts',
   RESEND_COUNTDOWN: 'resend_countdown',
+  RESET_PASSWORD_EMAIL: 'reset_password_email',
 } as const;
 
 // Companion marker the backend sets alongside the httpOnly refresh_token
@@ -59,4 +60,16 @@ export const clearVerificationData = () => {
   removeVerificationEmail();
   removeResendAttempts();
   removeResendCountdown();
+};
+
+export const setResetPasswordEmail = (email: string) => {
+  Cookies.set(COOKIE_KEYS.RESET_PASSWORD_EMAIL, email, { expires: 1, secure: true, sameSite: 'lax' });
+};
+
+export const getResetPasswordEmail = (): string | null => {
+  return Cookies.get(COOKIE_KEYS.RESET_PASSWORD_EMAIL) || null;
+};
+
+export const removeResetPasswordEmail = () => {
+  Cookies.remove(COOKIE_KEYS.RESET_PASSWORD_EMAIL);
 };

@@ -82,16 +82,16 @@ const AuthLayout = ({
         </div>
 
         {/* Form Containers */}
-        <div className="relative flex-1 w-full h-full flex overflow-hidden">
+        <div className="relative flex-1 w-full min-h-0 flex overflow-hidden">
           {/* Register Form Section */}
           <div
             className={`
-              w-full md:w-1/2 h-full flex flex-col justify-between p-4 sm:p-6 md:p-8 overflow-y-auto z-10
+              w-full md:w-1/2 h-full flex flex-col p-4 sm:p-6 md:p-8 overflow-y-auto auth-scrollbar z-10
               transition-all duration-500 ease-in-out
               ${isLoginMode ? "hidden md:flex md:opacity-0 md:pointer-events-none" : "flex opacity-100"}
             `}
           >
-            <div className="max-w-md mx-auto w-full my-auto">
+            <div className="max-w-md mx-auto w-full">
               <div className="text-center mb-4 sm:mb-6">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-dark dark:text-white mb-1">
                   Create Account
@@ -104,7 +104,7 @@ const AuthLayout = ({
               <RegisterForm />
             </div>
 
-            <div className="mt-3 sm:mt-4 text-center">
+            <div className="mt-3 sm:mt-4 text-center shrink-0">
               <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
                 Already have an account?{" "}
                 <button
@@ -122,12 +122,12 @@ const AuthLayout = ({
           {/* Login Form Section */}
           <div
             className={`
-              w-full md:w-1/2 h-full flex flex-col justify-between p-4 sm:p-6 md:p-8 overflow-y-auto z-10
+              w-full md:w-1/2 h-full flex flex-col p-4 sm:p-6 md:p-8 overflow-y-auto auth-scrollbar z-10
               transition-all duration-500 ease-in-out
               ${!isLoginMode ? "hidden md:flex md:opacity-0 md:pointer-events-none" : "flex opacity-100"}
             `}
           >
-            <div className="max-w-md mx-auto w-full my-auto">
+            <div className="max-w-md mx-auto w-full">
               <div className="text-center mb-6 sm:mb-8">
                 <h1 className="text-2xl sm:text-3xl font-bold text-dark dark:text-white mb-2">
                   Welcome Back
@@ -140,7 +140,7 @@ const AuthLayout = ({
               <LoginForm />
             </div>
 
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center shrink-0">
               <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
                 Don't have an account?{" "}
                 <button

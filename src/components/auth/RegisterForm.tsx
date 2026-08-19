@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { useForm, type SubmitHandler, type FieldErrors } from "react-hook-form";
-import { Lock, Eye, EyeOff } from "lucide-react";
+import { Lock, Eye, EyeOff, Camera } from "lucide-react";
 import { useRegister } from "../../features/auth/auth.hooks";
 import type { RegisterData } from "../../api/auth.api";
 import { useNavigate } from "react-router-dom";
 import { setVerificationEmail } from "../../utils/cookies";
-
-const roleOptions = [
-  { value: "Admin", label: "Admin" },
-  { value: "Manager", label: "Manager" },
-  { value: "Employee", label: "Employee" },
-] as const;
 
 const RegisterForm = () => {
   const {
@@ -18,6 +12,7 @@ const RegisterForm = () => {
     handleSubmit,
     watch,
     formState: { errors, isSubmitting, isValid },
+    setValue,
   } = useForm<RegisterData>({
     mode: "onChange",
   });
@@ -27,6 +22,8 @@ const RegisterForm = () => {
   const password = watch("password");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const profileFile = watch("profilePicture");
 
   const onSubmit: SubmitHandler<RegisterData> = (data) => {
     registerUser(data, {
@@ -35,13 +32,6 @@ const RegisterForm = () => {
         navigate("/verify-email");
       },
     });
-  };
-
-  const validateConfirmPassword = (value: string | undefined): boolean | string => {
-    if (value !== password) {
-      return "Passwords do not match";
-    }
-    return true;
   };
 
   const getErrorMessage = (
@@ -74,6 +64,51 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
+      {/* Profile Picture */}
+      <div className="flex justify-center">
+        <label
+          htmlFor="profilePicture"
+          className="relative group cursor-pointer"
+        >
+          <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-white/10 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden transition-colors group-hover:border-primary">
+            {profilePreview ? (
+              <img
+                src={profilePreview}
+                alt="Profile preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+            )}
+          </div>
+          <input
+            id="profilePicture"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                  alert("Profile picture must be less than 2 MB");
+                  return;
+                }
+                setValue("profilePicture", file, { shouldValidate: true });
+                const reader = new FileReader();
+                reader.onload = () => setProfilePreview(reader.result as string);
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          <span className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/5 transition-colors" />
+        </label>
+      </div>
+      {profileFile instanceof File && (
+        <p className="text-center text-[10px] text-gray-500 dark:text-gray-400">
+          {profileFile.name}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label
@@ -253,70 +288,70 @@ const RegisterForm = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
-          >
-            Email{" "}
-            <span className="text-red-500" aria-hidden="true">
-              *
-            </span>
-          </label>
-          <input
-            id="username"
-            type="email"
-            autoComplete="email"
-            placeholder="mohamed@gmail.com"
-            {...register("username", {
-              required: "Email is required",
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: "Invalid email",
-              },
-            })}
-            className={inputClasses(!!errors.username)}
-            aria-invalid={errors.username ? "true" : "false"}
-            disabled={isSubmitting}
-          />
-          {errors.username && (
-            <p className="mt-0.5 text-xs text-red-500" role="alert">
-              {getErrorMessage(errors.username)}
-            </p>
-          )}
-        </div>
+      <div>
+        <label
+          htmlFor="username"
+          className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
+        >
+          Username{" "}
+          <span className="text-red-500" aria-hidden="true">
+            *
+          </span>
+        </label>
+        <input
+          id="username"
+          type="text"
+          autoComplete="username"
+          placeholder="mohamed123"
+          {...register("username", {
+            required: "Username is required",
+            minLength: { value: 3, message: "Min 3 characters" },
+          })}
+          className={inputClasses(!!errors.username)}
+          aria-invalid={errors.username ? "true" : "false"}
+          disabled={isSubmitting}
+        />
+        {errors.username && (
+          <p className="mt-0.5 text-xs text-red-500" role="alert">
+            {getErrorMessage(errors.username)}
+          </p>
+        )}
+      </div>
 
-        <div>
-          <label
-            htmlFor="role"
-            className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
-          >
-            Role{" "}
-            <span className="text-red-500" aria-hidden="true">
-              *
-            </span>
-          </label>
-          <select
-            id="role"
-            {...register("role", { required: "Role is required" })}
-            className={inputClasses(!!errors.role)}
-            aria-invalid={errors.role ? "true" : "false"}
-            disabled={isSubmitting}
-          >
-            <option value="">Select Role</option>
-            {roleOptions.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.label}
-              </option>
-            ))}
-          </select>
-          {errors.role && (
-            <p className="mt-0.5 text-xs text-red-500" role="alert">
-              {getErrorMessage(errors.role)}
-            </p>
-          )}
-        </div>
+      <div>
+        <label
+          htmlFor="email"
+          className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
+        >
+          Email Address{" "}
+          <span className="text-red-500" aria-hidden="true">
+            *
+          </span>
+        </label>
+        <input
+          id="email"
+          type="email"
+          autoComplete="email"
+          placeholder="mohamed@gmail.com"
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Invalid email",
+            },
+          })}
+          className={inputClasses(!!errors.email)}
+          aria-invalid={errors.email ? "true" : "false"}
+          disabled={isSubmitting}
+        />
+        <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
+          Used as login/username
+        </p>
+        {errors.email && (
+          <p className="mt-0.5 text-xs text-red-500" role="alert">
+            {getErrorMessage(errors.email)}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -387,7 +422,8 @@ const RegisterForm = () => {
               autoComplete="new-password"
               {...register("confirmPassword", {
                 required: "Confirm password",
-                validate: validateConfirmPassword,
+                validate: (value) =>
+                  value === password || "Passwords do not match",
               })}
               className={passwordInputClasses(!!errors.confirmPassword)}
               aria-invalid={errors.confirmPassword ? "true" : "false"}

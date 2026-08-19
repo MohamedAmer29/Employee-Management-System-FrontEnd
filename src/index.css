@@ -195,3 +195,42 @@ input:-webkit-autofill:active {
 .dark .table-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.5);
 }
+
+/* Auth form scrollbar */
+.auth-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(63, 114, 175, 0.35) transparent;
+}
+
+.auth-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.auth-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(63, 114, 175, 0.35);
+  border-radius: 9999px;
+}
+
+.auth-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 114, 175, 0.6);
+}
+
+.auth-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.dark .auth-scrollbar {
+  scrollbar-color: rgba(63, 114, 175, 0.45) transparent;
+}
+
+.dark .auth-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(63, 114, 175, 0.45);
+}
+
+.dark .auth-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 114, 175, 0.7);
+}
