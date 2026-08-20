@@ -25,6 +25,7 @@ import {
   type ChartItem,
 } from "@/components/dashboard/charts";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const getStatusConfig = (status: TaskStatus) => {
   switch (status) {
@@ -193,17 +194,19 @@ const EmployeeTasks = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-          My Tasks
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Track and manage your assigned tasks
-        </p>
-      </div>
+      <Reveal y={20}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+            My Tasks
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Track and manage your assigned tasks
+          </p>
+        </div>
+      </Reveal>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <Reveal stagger className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
             <ListTodo className="w-6 h-6" aria-hidden="true" />
@@ -256,13 +259,15 @@ const EmployeeTasks = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DoughnutChartCard title="Status Distribution" items={statusChartItems} />
-        <BarChartCard title="Priority Breakdown" items={priorityChartItems} />
-      </div>
+      <Reveal y={20} delay={0.1}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DoughnutChartCard title="Status Distribution" items={statusChartItems} />
+          <BarChartCard title="Priority Breakdown" items={priorityChartItems} />
+        </div>
+      </Reveal>
 
       {/* Overdue Alert */}
       {stats.overdue > 0 && (
@@ -290,7 +295,7 @@ const EmployeeTasks = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Reveal stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tasks.map((task) => {
             const statusCfg = getStatusConfig(task.status);
             const priorityCfg = getPriorityConfig(task.priority);
@@ -419,7 +424,7 @@ const EmployeeTasks = () => {
               </div>
             );
           })}
-        </div>
+        </Reveal>
       )}
     </div>
   );

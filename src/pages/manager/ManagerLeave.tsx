@@ -22,6 +22,7 @@ import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
 import type { LeaveStatus } from "@/api/user.api";
+import Reveal from "@/components/common/Reveal";
 
 const statusOptions: { value: LeaveStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -106,6 +107,7 @@ const ManagerLeave = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -116,8 +118,10 @@ const ManagerLeave = () => {
           </p>
         </div>
       </div>
+      </Reveal>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
@@ -172,8 +176,10 @@ const ManagerLeave = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Leave requests table */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -381,6 +387,7 @@ const ManagerLeave = () => {
           </div>
         )}
       </div>
+      </Reveal>
 
       {rejectTarget && (
         <div

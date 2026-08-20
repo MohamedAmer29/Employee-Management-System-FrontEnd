@@ -293,63 +293,33 @@ const RegisterForm = () => {
           htmlFor="username"
           className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
         >
-          Username{" "}
-          <span className="text-red-500" aria-hidden="true">
-            *
-          </span>
-        </label>
-        <input
-          id="username"
-          type="text"
-          autoComplete="username"
-          placeholder="mohamed123"
-          {...register("username", {
-            required: "Username is required",
-            minLength: { value: 3, message: "Min 3 characters" },
-          })}
-          className={inputClasses(!!errors.username)}
-          aria-invalid={errors.username ? "true" : "false"}
-          disabled={isSubmitting}
-        />
-        {errors.username && (
-          <p className="mt-0.5 text-xs text-red-500" role="alert">
-            {getErrorMessage(errors.username)}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="email"
-          className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1"
-        >
           Email Address{" "}
           <span className="text-red-500" aria-hidden="true">
             *
           </span>
         </label>
         <input
-          id="email"
+          id="username"
           type="email"
           autoComplete="email"
           placeholder="mohamed@gmail.com"
-          {...register("email", {
+          {...register("username", {
             required: "Email is required",
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Invalid email",
+              message: "Invalid email address",
             },
           })}
-          className={inputClasses(!!errors.email)}
-          aria-invalid={errors.email ? "true" : "false"}
+          className={inputClasses(!!errors.username)}
+          aria-invalid={errors.username ? "true" : "false"}
           disabled={isSubmitting}
         />
         <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
-          Used as login/username
+          Email address used as the login/username
         </p>
-        {errors.email && (
+        {errors.username && (
           <p className="mt-0.5 text-xs text-red-500" role="alert">
-            {getErrorMessage(errors.email)}
+            {getErrorMessage(errors.username)}
           </p>
         )}
       </div>

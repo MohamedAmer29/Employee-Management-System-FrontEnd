@@ -27,6 +27,7 @@ import type { TaskStatus, TaskPriority, UpdateTaskRequest } from "@/api/user.api
 import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const getStatusConfig = (status: TaskStatus) => {
   switch (status) {
@@ -144,6 +145,7 @@ const ManagerTaskDetails = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center gap-4">
         <button
           type="button"
@@ -259,8 +261,10 @@ const ManagerTaskDetails = () => {
           </button>
         </div>
       </div>
+      </Reveal>
 
       {/* Details Card */}
+      <Reveal>
       <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
         {/* Description */}
         <div className="p-6 border-b border-gray-100 dark:border-gray-800">
@@ -396,6 +400,7 @@ const ManagerTaskDetails = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Edit Modal */}
       {isEditOpen && (

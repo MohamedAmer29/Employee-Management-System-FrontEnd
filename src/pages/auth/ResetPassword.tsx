@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Lock, Eye, EyeOff, ArrowLeft, Loader2, KeyRound, ShieldCheck } from "lucide-react";
-import { motion } from "motion/react";
 import { useResetPassword } from "@/features/auth/auth.hooks";
 import SeoHead from "@/components/common/SeoHead";
 
@@ -37,12 +36,7 @@ const ResetPassword = () => {
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#E3F2FD] dark:bg-[#0A1C33]">
       <SeoHead title="Reset Password" path="/reset-password" />
       <div className="w-full max-w-md">
-        <motion.div
-          initial={{ y: 30, opacity: 0, scale: 0.97 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl p-8"
-        >
+        <div className="bg-white dark:bg-dark-surface rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-2xl bg-primary/15 text-primary mb-4">
               <KeyRound className="w-7 h-7" />
@@ -166,7 +160,7 @@ const ResetPassword = () => {
               Back to Login
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

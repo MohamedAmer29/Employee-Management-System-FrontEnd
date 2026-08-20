@@ -33,6 +33,7 @@ import { DoughnutChartCard, BarChartCard } from "@/components/dashboard/charts";
 import type { RecentActivity } from "@/api/user.api";
 import AnimatedNumber from "@/components/common/AnimatedNumber";
 import SeoHead from "@/components/common/SeoHead";
+import Reveal from "@/components/common/Reveal";
 
 const ACTIVITIES_PER_PAGE = 7;
 
@@ -293,34 +294,38 @@ const AdminHome = () => {
   return (
     <div className="space-y-6">
       <SeoHead title="Dashboard" path="/home" />
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
-          Dashboard
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          An overview of your organization's activity.
-        </p>
-      </div>
-
-      <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div
-          className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5"
-          aria-hidden="true"
-        />
-        <div className="relative">
-          <p className="text-sm font-medium text-white/80">Welcome back,</p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
-            {displayName} 👋
-          </h2>
-          <p className="text-sm text-white/75 mt-2 max-w-xl">
-            Here's what's happening with your organization today.
+      <Reveal y={20}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
+            Dashboard
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            An overview of your organization's activity.
           </p>
         </div>
-      </section>
+      </Reveal>
+
+      <Reveal y={30}>
+        <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+          <div
+            className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5"
+            aria-hidden="true"
+          />
+          <div className="relative">
+            <p className="text-sm font-medium text-white/80">Welcome back,</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
+              {displayName} 👋
+            </h2>
+            <p className="text-sm text-white/75 mt-2 max-w-xl">
+              Here's what's happening with your organization today.
+            </p>
+          </div>
+        </section>
+      </Reveal>
 
       {loadError}
 
@@ -336,24 +341,27 @@ const AdminHome = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {statCards.map((card) => (
-            <StatCard
-              key={card.label}
-              icon={card.icon}
-              label={card.label}
-              value={card.value}
-              hint={card.hint}
-            />
+            <Reveal key={card.label}>
+              <StatCard
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+                hint={card.hint}
+              />
+            </Reveal>
           ))}
-        </div>
+        </Reveal>
       )}
 
       {/* Analytics charts */}
       <section aria-label="Analytics charts">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-          Analytics
-        </h2>
+        <Reveal y={20}>
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+            Analytics
+          </h2>
+        </Reveal>
         {dashboardQuery.isLoading ? (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5"
@@ -366,35 +374,43 @@ const AdminHome = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-              <DoughnutChartCard title="Employees" items={employeeChartItems} />
-              <DoughnutChartCard
-                title="Attendance Today"
-                items={attendanceChartItems}
-              />
-              <DoughnutChartCard
-                title="Leave Requests"
-                items={leaveChartItems}
-              />
-            </div>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-5">
-              <BarChartCard
-                title="Employees per Department"
-                items={departmentChartItems}
-              />
-              <BarChartCard
-                title="Performance Distribution"
-                items={performanceChartItems}
-              />
-            </div>
+            <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              <Reveal><DoughnutChartCard title="Employees" items={employeeChartItems} /></Reveal>
+              <Reveal>
+                <DoughnutChartCard
+                  title="Attendance Today"
+                  items={attendanceChartItems}
+                />
+              </Reveal>
+              <Reveal>
+                <DoughnutChartCard
+                  title="Leave Requests"
+                  items={leaveChartItems}
+                />
+              </Reveal>
+            </Reveal>
+            <Reveal stagger className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 mt-4 sm:mt-5">
+              <Reveal>
+                <BarChartCard
+                  title="Employees per Department"
+                  items={departmentChartItems}
+                />
+              </Reveal>
+              <Reveal>
+                <BarChartCard
+                  title="Performance Distribution"
+                  items={performanceChartItems}
+                />
+              </Reveal>
+            </Reveal>
           </>
         )}
       </section>
 
       {/* Secondary panels */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+      <Reveal stagger className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
-        <div className="xl:col-span-2">
+        <Reveal className="xl:col-span-2">
           <Panel
             title="Recent Activities"
             action={
@@ -472,10 +488,10 @@ const AdminHome = () => {
               </p>
             )}
           </Panel>
-        </div>
+        </Reveal>
 
         {/* Summary column */}
-        <div className="space-y-4 sm:space-y-5">
+        <Reveal className="space-y-4 sm:space-y-5">
           <Panel title="Departments">
             {dashboardQuery.isLoading ? (
               <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
@@ -620,8 +636,8 @@ const AdminHome = () => {
               })()
             )}
           </Panel>
-        </div>
-      </div>
+        </Reveal>
+      </Reveal>
     </div>
   );
 };

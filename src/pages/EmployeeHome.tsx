@@ -28,9 +28,8 @@ import {
 } from "@/components/dashboard/charts";
 import { AttendanceStatusBadge } from "@/components/attendance/AttendanceStatusBadge";
 import AnimatedNumber from "@/components/common/AnimatedNumber";
-import Reveal from "@/components/motion/Reveal";
-import { RevealChild } from "@/components/motion/RevealChild";
 import SeoHead from "@/components/common/SeoHead";
+import Reveal from "@/components/common/Reveal";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const formatTime = (time: string | null) => {
@@ -239,7 +238,7 @@ const EmployeeHome = () => {
   return (
     <div className="space-y-6">
       <SeoHead title="My Dashboard" path="/home" />
-      <Reveal y={25}>
+      <Reveal y={20}>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
           My Dashboard
         </h1>
@@ -248,38 +247,38 @@ const EmployeeHome = () => {
         </p>
       </Reveal>
 
-      <Reveal y={30} delay={0.08}>
+      <Reveal y={30}>
         <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden banner-float">
-        <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
-        <div className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
-        <div className="relative flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-white/80">Welcome back,</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
-              {displayName} 👋
-            </h2>
-            {dashboard && (
-              <p className="text-sm text-white/75 mt-2 max-w-xl">
-                {dashboard.employee.position} · {dashboard.employee.department}
-                {dashboard.employee.hireDate
-                  ? ` · Hired ${formatDateInUserZone(dashboard.employee.hireDate, { dateOnly: true })}`
-                  : ""}
-              </p>
-            )}
-          </div>
-          <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/15 px-5 py-4">
-            <div className="flex items-center gap-2 text-white/80 text-xs font-semibold uppercase tracking-wider">
-              <ClockArrowDown className="w-4 h-4" />
-              Today's status
+          <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
+          <div className="absolute top-10 right-20 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
+          <div className="relative flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-white/80">Welcome back,</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold mt-1">
+                {displayName} 👋
+              </h2>
+              {dashboard && (
+                <p className="text-sm text-white/75 mt-2 max-w-xl">
+                  {dashboard.employee.position} · {dashboard.employee.department}
+                  {dashboard.employee.hireDate
+                    ? ` · Hired ${formatDateInUserZone(dashboard.employee.hireDate, { dateOnly: true })}`
+                    : ""}
+                </p>
+              )}
             </div>
-            <div className="mt-2">
-              <AttendanceStatusBadge
-                status={dashboard?.attendance.today.status ?? "UPCOMING"}
-              />
+            <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/15 px-5 py-4">
+              <div className="flex items-center gap-2 text-white/80 text-xs font-semibold uppercase tracking-wider">
+                <ClockArrowDown className="w-4 h-4" />
+                Today's status
+              </div>
+              <div className="mt-2">
+                <AttendanceStatusBadge
+                  status={dashboard?.attendance.today.status ?? "UPCOMING"}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       </Reveal>
 
       {loadError}
@@ -304,7 +303,7 @@ const EmployeeHome = () => {
       ) : (
         <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {statCards.map((card) => (
-            <RevealChild key={card.label}>
+            <Reveal key={card.label}>
               <StatCard
                 icon={card.icon}
                 label={card.label}
@@ -312,95 +311,99 @@ const EmployeeHome = () => {
                 hint={card.hint}
                 accentClass={card.accentClass}
               />
-            </RevealChild>
+            </Reveal>
           ))}
         </Reveal>
       )}
 
       {/* Today's check-in / check-out */}
       <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-        <Panel title="Today's Attendance">
-          {dashboardQuery.isLoading ? (
-            <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-4">
-                <div className="flex items-center gap-2 text-sky-500">
-                  <ClockArrowDown className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Check In
-                  </span>
+        <Reveal>
+          <Panel title="Today's Attendance">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-4">
+                  <div className="flex items-center gap-2 text-sky-500">
+                    <ClockArrowDown className="w-4 h-4" aria-hidden="true" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Check In
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xl font-bold text-gray-900 dark:text-gray-50">
+                    {formatTime(dashboard?.attendance.today.checkIn ?? null)}
+                  </p>
                 </div>
-                <p className="mt-2 text-xl font-bold text-gray-900 dark:text-gray-50">
-                  {formatTime(dashboard?.attendance.today.checkIn ?? null)}
-                </p>
-              </div>
-              <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-4">
-                <div className="flex items-center gap-2 text-amber-500">
-                  <ClockArrowUp className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Check Out
-                  </span>
+                <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-4">
+                  <div className="flex items-center gap-2 text-amber-500">
+                    <ClockArrowUp className="w-4 h-4" aria-hidden="true" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Check Out
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xl font-bold text-gray-900 dark:text-gray-50">
+                    {formatTime(dashboard?.attendance.today.checkOut ?? null)}
+                  </p>
                 </div>
-                <p className="mt-2 text-xl font-bold text-gray-900 dark:text-gray-50">
-                  {formatTime(dashboard?.attendance.today.checkOut ?? null)}
-                </p>
               </div>
-            </div>
-          )}
-        </Panel>
+            )}
+          </Panel>
+        </Reveal>
 
-        <Panel title="Personal Info">
-          {dashboardQuery.isLoading ? (
-            <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10 text-primary">
-                  <Briefcase className="w-5 h-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.employee.position ?? "—"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Position
-                  </p>
+        <Reveal>
+          <Panel title="Personal Info">
+            {dashboardQuery.isLoading ? (
+              <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/10 text-primary">
+                    <Briefcase className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
+                      {dashboard?.employee.position ?? "—"}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Position
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                    <Building2 className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
+                      {dashboard?.employee.department ?? "—"}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Department
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <CalendarClock className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
+                      {dashboard?.employee.hireDate
+                        ? formatDateInUserZone(dashboard.employee.hireDate, {
+                            dateOnly: true,
+                          })
+                        : "—"}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Hire date
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
-                  <Building2 className="w-5 h-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.employee.department ?? "—"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Department
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center h-10 w-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <CalendarClock className="w-5 h-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 dark:text-gray-50">
-                    {dashboard?.employee.hireDate
-                      ? formatDateInUserZone(dashboard.employee.hireDate, {
-                          dateOnly: true,
-                        })
-                      : "—"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Hire date
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </Panel>
+            )}
+          </Panel>
+        </Reveal>
       </Reveal>
 
       {dashboardQuery.isLoading ? (
@@ -421,54 +424,66 @@ const EmployeeHome = () => {
         </div>
       ) : (
         <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-          <RevealChild><DoughnutChartCard
-            title="Attendance Today"
-            items={attendanceChartItems}
-          /></RevealChild>
-          <RevealChild><DoughnutChartCard title="Leave Requests" items={leaveChartItems} /></RevealChild>
-          <RevealChild><DoughnutChartCard
-            title="Performance Distribution"
-            items={performanceChartItems}
-          /></RevealChild>
+          <Reveal>
+            <DoughnutChartCard
+              title="Attendance Today"
+              items={attendanceChartItems}
+            />
+          </Reveal>
+          <Reveal>
+            <DoughnutChartCard title="Leave Requests" items={leaveChartItems} />
+          </Reveal>
+          <Reveal>
+            <DoughnutChartCard
+              title="Performance Distribution"
+              items={performanceChartItems}
+            />
+          </Reveal>
         </Reveal>
       )}
 
-      <Panel title="Attendance Trend">
-        {dashboardQuery.isLoading ? (
-          <div className="h-64 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
-        ) : presentTrend.length > 0 ? (
-          <LineChartCard
-            title="Present vs Absent"
-            series={[
-              { title: "Present", color: "#10B981", items: presentTrend },
-              { title: "Absent", color: "#EF4444", items: absentTrend },
-            ]}
-            pointDelay={50}
-            duration={800}
-          />
-        ) : (
-          <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
-            No attendance trend data yet.
-          </p>
-        )}
-      </Panel>
+      <Reveal>
+        <Panel title="Attendance Trend">
+          {dashboardQuery.isLoading ? (
+            <div className="h-64 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
+          ) : presentTrend.length > 0 ? (
+            <LineChartCard
+              title="Present vs Absent"
+              series={[
+                { title: "Present", color: "#10B981", items: presentTrend },
+                { title: "Absent", color: "#EF4444", items: absentTrend },
+              ]}
+              pointDelay={50}
+              duration={800}
+            />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No attendance trend data yet.
+            </p>
+          )}
+        </Panel>
+      </Reveal>
 
       {dashboard?.payroll.history && dashboard.payroll.history.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-          <DoughnutChartCard
-            title="Payroll Status"
-            items={payrollStatusItems}
-          />
-          <BarChartCard
-            title="Net Salary by Month"
-            items={payrollSalaryItems}
-          />
-        </div>
+        <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          <Reveal>
+            <DoughnutChartCard
+              title="Payroll Status"
+              items={payrollStatusItems}
+            />
+          </Reveal>
+          <Reveal>
+            <BarChartCard
+              title="Net Salary by Month"
+              items={payrollSalaryItems}
+            />
+          </Reveal>
+        </Reveal>
       )}
 
       <Reveal stagger className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
-        <div className="xl:col-span-2">
+        <Reveal className="xl:col-span-2">
           <Panel title="Recent Activities">
             {dashboardQuery.isLoading ? (
               <div className="space-y-3 animate-pulse">
@@ -501,10 +516,10 @@ const EmployeeHome = () => {
               </p>
             )}
           </Panel>
-        </div>
+        </Reveal>
 
         {/* Notifications + latest review */}
-        <div className="space-y-4 sm:space-y-5">
+        <Reveal className="space-y-4 sm:space-y-5">
           <Panel title="Notifications">
             <button
               type="button"
@@ -575,7 +590,7 @@ const EmployeeHome = () => {
               </p>
             )}
           </Panel>
-        </div>
+        </Reveal>
       </Reveal>
     </div>
   );

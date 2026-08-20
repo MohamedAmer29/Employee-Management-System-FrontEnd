@@ -23,6 +23,7 @@ import { useManagerEmployees } from "@/features/employees/employees.hooks";
 import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const ratingOptions = ["all", 1, 2, 3, 4, 5];
 
@@ -201,6 +202,7 @@ const ManagerPerformance = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -221,8 +223,10 @@ const ManagerPerformance = () => {
           </button>
         </div>
       </div>
+      </Reveal>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
@@ -269,8 +273,10 @@ const ManagerPerformance = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Filters */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -310,6 +316,7 @@ const ManagerPerformance = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Cards */}
       {isLoading ? (
@@ -701,6 +708,7 @@ const EmployeePerformanceView = ({
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center gap-4">
         <button
           type="button"
@@ -719,8 +727,10 @@ const EmployeePerformanceView = ({
           </p>
         </div>
       </div>
+      </Reveal>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
@@ -767,6 +777,7 @@ const EmployeePerformanceView = ({
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Reviews */}
       {isLoading ? (

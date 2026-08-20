@@ -29,7 +29,7 @@ export default defineConfig({
             if (id.includes('chart.js')) {
               return 'vendor-charts';
             }
-            if (id.includes('axios') || id.includes('js-cookie') || id.includes('jwt-decode')) {
+            if (id.includes('axios') || id.includes('js-cookie') || id.includes('jwt-decode') || id.includes('gsap')) {
               return 'vendor-utils';
             }
             return 'vendor-misc';

@@ -36,6 +36,7 @@ import type { RootState } from "@/store/store";
 import type { UpdateEmployeeRequest, User } from "@/api/user.api";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const PAGE_SIZES = [5, 10, 15, 20];
 
@@ -299,52 +300,57 @@ const Employees = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-            Employees
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {total} employee{total === 1 ? "" : "s"}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-            Add Employee
-          </button>
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search by name, email, phone, position, role, or department..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            />
+      <Reveal y={20}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+              Employees
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {total} employee{total === 1 ? "" : "s"}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              Add Employee
+            </button>
           </div>
         </div>
-      </div>
+      </Reveal>
+
+      {/* Toolbar */}
+      <Reveal y={20} delay={0.1}>
+        <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search by name, email, phone, position, role, or department..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-white/5 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+        </div>
+      </Reveal>
 
       {/* Employees Table */}
-      <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
-        {isLoading ? (
+      <Reveal y={20} delay={0.15}>
+        <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+          {isLoading ? (
           <div className="p-8 text-center">
             <div className="inline-block h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
@@ -645,7 +651,8 @@ const Employees = () => {
           </div>
         </>
         )}
-      </div>
+        </div>
+      </Reveal>
 
       {/* Add employee modal */}
       {isAddModalOpen && (

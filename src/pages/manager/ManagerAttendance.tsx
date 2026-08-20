@@ -26,6 +26,7 @@ import Avatar from "@/components/common/Avatar";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const formatTime = (time: string) => {
   if (!time) return "";
@@ -202,6 +203,7 @@ const ManagerAttendance = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -212,8 +214,10 @@ const ManagerAttendance = () => {
           </p>
         </div>
       </div>
+      </Reveal>
 
       {/* Employee card */}
+      <Reveal>
       <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-5 sm:p-6 text-white shadow-md relative overflow-hidden">
         <div
           className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10"
@@ -252,6 +256,7 @@ const ManagerAttendance = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Check in / Check out */}
       <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 sm:p-6 shadow-sm">
@@ -464,6 +469,7 @@ const ManagerAttendance = () => {
       </div>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
@@ -505,8 +511,10 @@ const ManagerAttendance = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Chart + Records */}
+      <Reveal>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <DoughnutChartCard title="Present vs Absent" items={doughnutItems} />
 
@@ -643,6 +651,7 @@ const ManagerAttendance = () => {
           )}
         </div>
       </div>
+      </Reveal>
     </div>
   );
 };

@@ -24,6 +24,7 @@ import {
 } from "@/components/dashboard/charts";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 import type { LeaveStatus } from "@/api/user.api";
 
 interface LeaveRequestForm {
@@ -128,27 +129,29 @@ const MyLeave = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-            My Leave
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Request time off and track your leave requests
-          </p>
+      <Reveal y={20}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+              My Leave
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Request time off and track your leave requests
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            New Leave Request
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-colors shadow-sm cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <Plus className="w-4 h-4" aria-hidden="true" />
-          New Leave Request
-        </button>
-      </div>
+      </Reveal>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <Reveal stagger className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary shrink-0">
             <CalendarDays className="w-6 h-6" aria-hidden="true" />
@@ -201,10 +204,11 @@ const MyLeave = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Reveal y={20} delay={0.1}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DoughnutChartCard title="Leave Status Breakdown" items={statusChartItems} />
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
@@ -245,9 +249,11 @@ const MyLeave = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Leave requests table */}
-      <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+      <Reveal y={20} delay={0.15}>
+        <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
             My Leave Requests
@@ -360,6 +366,7 @@ const MyLeave = () => {
           </div>
         )}
       </div>
+      </Reveal>
 
       {/* New leave request modal */}
       {isModalOpen && (

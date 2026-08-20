@@ -13,6 +13,7 @@ import {
 import { useEmployeePayrollRecord } from "@/features/payroll/payroll.hooks";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 import type { PayrollStatus } from "@/api/user.api";
 
 const monthNames = [
@@ -170,7 +171,8 @@ const EmployeePayrollDetails = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <Reveal y={20}>
+        <div className="flex items-center gap-4">
         <button
           type="button"
           onClick={() => navigate("/my-payroll")}
@@ -192,10 +194,11 @@ const EmployeePayrollDetails = () => {
             </span>
           </div>
         </div>
-      </div>
+        </div>
+      </Reveal>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <Reveal stagger className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
             <DollarSign className="w-6 h-6" aria-hidden="true" />
@@ -248,12 +251,13 @@ const EmployeePayrollDetails = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Details grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Section title="Salary Breakdown">
-          <InfoRow label="Base Salary" value={record.baseSalary} />
+      <Reveal y={20} delay={0.1}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Section title="Salary Breakdown">
+            <InfoRow label="Base Salary" value={record.baseSalary} />
           <InfoRow label="Daily Salary" value={record.dailySalary} />
           <InfoRow
             label="Net Salary"
@@ -282,6 +286,7 @@ const EmployeePayrollDetails = () => {
           />
         </Section>
       </div>
+      </Reveal>
 
       {/* Deductions & Bonuses */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

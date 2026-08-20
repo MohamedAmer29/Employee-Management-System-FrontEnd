@@ -28,6 +28,7 @@ import {
   type ChartItem,
 } from "@/components/dashboard/charts";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const statusOptions: { value: string; label: string }[] = [
   { value: "", label: "All statuses" },
@@ -192,14 +193,16 @@ const EmployeePayroll = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-          My Payroll
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          View your salary records and payment history
-        </p>
-      </div>
+      <Reveal y={20}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+            My Payroll
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            View your salary records and payment history
+          </p>
+        </div>
+      </Reveal>
 
       {/* Current payroll banner */}
       {!isCurrentLoading && currentPayroll && (
@@ -284,7 +287,7 @@ const EmployeePayroll = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <Reveal stagger className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (
               <div
@@ -354,14 +357,16 @@ const EmployeePayroll = () => {
                 </div>
               </>
             )}
-      </div>
+      </Reveal>
 
       {/* Charts */}
       {!isLoading && records.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DoughnutChartCard title="Status Distribution" items={statusChartItems} />
-          <BarChartCard title="Net Salary by Month" items={salaryChartItems} />
-        </div>
+        <Reveal y={20} delay={0.1}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DoughnutChartCard title="Status Distribution" items={statusChartItems} />
+            <BarChartCard title="Net Salary by Month" items={salaryChartItems} />
+          </div>
+        </Reveal>
       )}
 
       {/* Filters */}
@@ -506,7 +511,7 @@ const EmployeePayroll = () => {
           </div>
 
           <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
-            <div className="table-scrollbar max-h-[65vh] overflow-auto">
+              <div className="table-scrollbar max-h-[65vh] overflow-auto">
               <table className="w-full min-w-[800px]">
                 <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-gray-800">
                   <tr>
@@ -584,7 +589,6 @@ const EmployeePayroll = () => {
                 </tbody>
               </table>
             </div>
-          </div>
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -616,6 +620,7 @@ const EmployeePayroll = () => {
               </button>
             </div>
           </div>
+        </div>
         </>
       )}
     </div>

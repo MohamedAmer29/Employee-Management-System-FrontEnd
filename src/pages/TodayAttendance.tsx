@@ -19,6 +19,7 @@ import {
   BarChartCard,
   type ChartItem,
 } from "@/components/dashboard/charts";
+import Reveal from "@/components/common/Reveal";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { AttendanceStatusBadge } from "@/components/attendance/AttendanceStatusBadge";
 
@@ -65,26 +66,28 @@ const TodayAttendance = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate("/attendance")}
-              className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary transition-colors cursor-pointer mb-3 "
-            >
-              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              Attendance
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-              Today's Attendance
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Live attendance snapshot for today
-            </p>
+      <Reveal y={20}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div>
+              <button
+                type="button"
+                onClick={() => navigate("/attendance")}
+                className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary transition-colors cursor-pointer mb-3 "
+              >
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                Attendance
+              </button>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+                Today's Attendance
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Live attendance snapshot for today
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {isLoading ? (
         <div
@@ -139,7 +142,7 @@ const TodayAttendance = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <Reveal stagger className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 flex items-center gap-4">
               <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                 <UserCheck className="w-6 h-6" aria-hidden="true" />
@@ -205,7 +208,7 @@ const TodayAttendance = () => {
                 </p>
               </div>
             </div>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5">
@@ -242,6 +245,7 @@ const TodayAttendance = () => {
             </div>
           </div>
 
+          <Reveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DoughnutChartCard
               title="Attendance Breakdown"
@@ -252,6 +256,7 @@ const TodayAttendance = () => {
               items={departmentItems}
             />
           </div>
+          </Reveal>
 
           {data.notCheckedIn.length > 0 && (
             <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
@@ -296,6 +301,7 @@ const TodayAttendance = () => {
             </div>
           )}
 
+          <Reveal>
           <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -362,6 +368,7 @@ const TodayAttendance = () => {
               </div>
             )}
           </div>
+          </Reveal>
         </>
       ) : (
         <div className="py-16 text-center">

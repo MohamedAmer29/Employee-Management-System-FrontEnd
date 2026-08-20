@@ -8,7 +8,6 @@ export interface RegisterData {
   phoneNumber: string;
   nationalId: string;
   username: string;
-  email: string;
   password: string;
   confirmPassword?: string;
   profilePicture?: File | null;
@@ -99,7 +98,6 @@ export const authApi = {
     formData.append("phoneNumber", data.phoneNumber);
     formData.append("nationalId", data.nationalId);
     formData.append("username", data.username);
-    formData.append("email", data.email);
     formData.append("password", data.password);
     if (data.profilePicture) {
       formData.append("profilePicture", data.profilePicture);

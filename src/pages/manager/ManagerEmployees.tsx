@@ -29,6 +29,7 @@ import type { RootState } from "@/store/store";
 import type { ManagerEmployeeParams, EmployeeDetail } from "@/api/user.api";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const PAGE_SIZES = [5, 10, 15, 20];
 
@@ -101,6 +102,7 @@ const ManagerEmployeesPage = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -119,8 +121,10 @@ const ManagerEmployeesPage = () => {
           Add Employee
         </button>
       </div>
+      </Reveal>
 
       {/* Search & filters */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm space-y-3">
         <div className="relative">
           <Search
@@ -146,8 +150,10 @@ const ManagerEmployeesPage = () => {
           <option value="inactive">Inactive</option>
         </select>
       </div>
+      </Reveal>
 
       {/* Employees table */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
@@ -443,6 +449,7 @@ const ManagerEmployeesPage = () => {
           </>
         )}
       </div>
+      </Reveal>
 
       {addTarget && (
         <AddEmployeeModal

@@ -22,6 +22,7 @@ import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
 import type { LeaveStatus } from "@/api/user.api";
+import Reveal from "@/components/common/Reveal";
 
 const statusBadge: Record<LeaveStatus, string> = {
   pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
@@ -107,6 +108,7 @@ const ManagerLeaveDetails = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Avatar
@@ -132,8 +134,10 @@ const ManagerLeaveDetails = () => {
           Back to Leave
         </button>
       </div>
+      </Reveal>
 
       {/* Request card */}
+      <Reveal>
       <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -226,6 +230,7 @@ const ManagerLeaveDetails = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {rejectTarget && (
         <div

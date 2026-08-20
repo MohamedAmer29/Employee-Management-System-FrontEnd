@@ -13,6 +13,7 @@ import {
 import { useAttendanceByEmployee } from "@/features/attendance/attendance.hooks";
 import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
+import Reveal from "@/components/common/Reveal";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const formatTime = (time: string) => {
@@ -75,34 +76,36 @@ const AttendanceDetails = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Avatar
-            name={employee?.fullName}
-            src={getAssetUrl(employee?.profilePicture)}
-            size="lg"
-          />
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-              {employee?.fullName ?? "Employee"}
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Attendance details · {employee?.email ?? ""}
-            </p>
+      <Reveal y={20}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Avatar
+              name={employee?.fullName}
+              src={getAssetUrl(employee?.profilePicture)}
+              size="lg"
+            />
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+                {employee?.fullName ?? "Employee"}
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Attendance details · {employee?.email ?? ""}
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate("/attendance")}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Back to Attendance
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate("/attendance")}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Back to Attendance
-        </button>
-      </div>
+      </Reveal>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <Reveal stagger className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
             <Users className="w-6 h-6" aria-hidden="true" />
@@ -142,9 +145,10 @@ const AttendanceDetails = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Records */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -238,6 +242,7 @@ const AttendanceDetails = () => {
           </div>
         )}
       </div>
+      </Reveal>
     </div>
   );
 };

@@ -27,6 +27,7 @@ import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { AttendanceStatusBadge } from "@/components/attendance/AttendanceStatusBadge";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const formatTime = (time: string) => {
   if (!time) return "—";
@@ -222,18 +223,21 @@ const MyAttendance = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-            My Attendance
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Track your attendance records and presence overview
-          </p>
+      <Reveal y={20}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+              My Attendance
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Track your attendance records and presence overview
+            </p>
+          </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Employee card */}
+      <Reveal>
       <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-5 sm:p-6 text-white shadow-md relative overflow-hidden">
         <div
           className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10"
@@ -272,8 +276,10 @@ const MyAttendance = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Check in / Check out */}
+      <Reveal>
       <section className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 sm:p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
@@ -394,6 +400,7 @@ const MyAttendance = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Loading skeleton */}
       {isLoading ? (
@@ -428,7 +435,7 @@ const MyAttendance = () => {
         </div>
       ) : (
         /* Stats */
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <Reveal stagger className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
             <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary shrink-0">
               <TrendingUp className="w-6 h-6" aria-hidden="true" />
@@ -507,7 +514,7 @@ const MyAttendance = () => {
               </p>
             </div>
           </div>
-        </div>
+        </Reveal>
       )}
 
       {/* Charts */}
@@ -536,6 +543,7 @@ const MyAttendance = () => {
       </div>
 
       {/* Attendance records */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -654,6 +662,7 @@ const MyAttendance = () => {
           </div>
         )}
       </div>
+      </Reveal>
     </div>
   );
 };

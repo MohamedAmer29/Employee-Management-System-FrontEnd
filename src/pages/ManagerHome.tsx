@@ -30,9 +30,8 @@ import {
 } from "@/components/dashboard/charts";
 import type { ManagerRecentActivity } from "@/api/user.api";
 import AnimatedNumber from "@/components/common/AnimatedNumber";
-import Reveal from "@/components/motion/Reveal";
-import { RevealChild } from "@/components/motion/RevealChild";
 import SeoHead from "@/components/common/SeoHead";
+import Reveal from "@/components/common/Reveal";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const ACTIVITIES_PER_PAGE = 7;
@@ -352,7 +351,7 @@ const ManagerHome = () => {
   return (
     <div className="space-y-6">
       <SeoHead title="Manager Dashboard" path="/home" />
-      <Reveal y={25}>
+      <Reveal y={20}>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">
             Dashboard
@@ -363,7 +362,7 @@ const ManagerHome = () => {
         </div>
       </Reveal>
 
-      <Reveal y={30} delay={0.08}>
+      <Reveal y={30}>
         <section className="rounded-2xl bg-gradient-to-br from-dark via-primary-dark to-primary p-6 sm:p-8 text-white shadow-md relative overflow-hidden banner-float">
           <div
             className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/10"
@@ -403,7 +402,7 @@ const ManagerHome = () => {
       ) : (
         <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {statCards.map((card) => (
-            <RevealChild key={card.label}>
+            <Reveal key={card.label}>
               <StatCard
                 icon={card.icon}
                 label={card.label}
@@ -411,16 +410,18 @@ const ManagerHome = () => {
                 hint={card.hint}
                 accentClass={card.accentClass}
               />
-            </RevealChild>
+            </Reveal>
           ))}
         </Reveal>
       )}
 
       {/* Analytics charts */}
       <section aria-label="Analytics charts">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-          Analytics
-        </h2>
+        <Reveal y={20}>
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+            Analytics
+          </h2>
+        </Reveal>
         {dashboardQuery.isLoading ? (
           <div className="space-y-4 sm:space-y-5">
             <div
@@ -439,60 +440,74 @@ const ManagerHome = () => {
             </div>
           </div>
         ) : (
-          <Reveal stagger className="space-y-4 sm:space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
-              <RevealChild><DoughnutChartCard
-                title="Attendance Today"
-                items={attendanceChartItems}
-              /></RevealChild>
-              <RevealChild><DoughnutChartCard
-                title="Leave Requests"
-                items={leaveChartItems}
-              /></RevealChild>
-              <RevealChild><DoughnutChartCard
-                title="Performance Distribution"
-                items={performanceChartItems}
-              /></RevealChild>
-            </div>
+          <div className="space-y-4 sm:space-y-5">
+            <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              <Reveal>
+                <DoughnutChartCard
+                  title="Attendance Today"
+                  items={attendanceChartItems}
+                />
+              </Reveal>
+              <Reveal>
+                <DoughnutChartCard
+                  title="Leave Requests"
+                  items={leaveChartItems}
+                />
+              </Reveal>
+              <Reveal>
+                <DoughnutChartCard
+                  title="Performance Distribution"
+                  items={performanceChartItems}
+                />
+              </Reveal>
+            </Reveal>
 
             {presentTrend.length > 0 ? (
-              <LineChartCard
-                title="Attendance Trend"
-                series={[
-                  { title: "Present", color: "#10B981", items: presentTrend },
-                  { title: "Absent", color: "#EF4444", items: absentTrend },
-                ]}
-                pointDelay={50}
-                duration={800}
-              />
+              <Reveal>
+                <LineChartCard
+                  title="Attendance Trend"
+                  series={[
+                    { title: "Present", color: "#10B981", items: presentTrend },
+                    { title: "Absent", color: "#EF4444", items: absentTrend },
+                  ]}
+                  pointDelay={50}
+                  duration={800}
+                />
+              </Reveal>
             ) : (
-              <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-                <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
-                  No attendance trend data yet.
-                </p>
-              </div>
+              <Reveal>
+                <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+                    No attendance trend data yet.
+                  </p>
+                </div>
+              </Reveal>
             )}
 
             {dashboard?.payroll && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                <DoughnutChartCard
-                  title="Payroll Status"
-                  items={payrollStatusItems}
-                />
-                <BarChartCard
-                  title="Salary Breakdown"
-                  items={payrollBreakdownItems}
-                />
-              </div>
+              <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <Reveal>
+                  <DoughnutChartCard
+                    title="Payroll Status"
+                    items={payrollStatusItems}
+                  />
+                </Reveal>
+                <Reveal>
+                  <BarChartCard
+                    title="Salary Breakdown"
+                    items={payrollBreakdownItems}
+                  />
+                </Reveal>
+              </Reveal>
             )}
-          </Reveal>
+          </div>
         )}
       </section>
 
       {/* Secondary panels */}
       <Reveal stagger className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
         {/* Recent activities */}
-        <div className="xl:col-span-2">
+        <Reveal className="xl:col-span-2">
           <Panel title="Recent Activities">
             {dashboardQuery.isLoading ? (
               <div className="space-y-3 animate-pulse">
@@ -556,10 +571,10 @@ const ManagerHome = () => {
               </p>
             )}
           </Panel>
-        </div>
+        </Reveal>
 
         {/* Summary column */}
-        <div className="space-y-4 sm:space-y-5">
+        <Reveal className="space-y-4 sm:space-y-5">
           <Panel title="Department">
             {dashboardQuery.isLoading ? (
               <div className="h-16 rounded-lg bg-gray-200 dark:bg-white/10 animate-pulse" />
@@ -645,7 +660,7 @@ const ManagerHome = () => {
               </p>
             )}
           </Panel>
-        </div>
+        </Reveal>
       </Reveal>
     </div>
   );

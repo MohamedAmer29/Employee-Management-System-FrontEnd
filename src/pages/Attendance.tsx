@@ -31,6 +31,7 @@ import Avatar from "@/components/common/Avatar";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { getAssetUrl } from "@/utils/assetUrl";
 import type { AttendancePeriod } from "@/api/user.api";
+import Reveal from "@/components/common/Reveal";
 import { formatDateInUserZone } from "@/utils/formatDate";
 
 const formatTime = (time: string) => {
@@ -192,19 +193,21 @@ const Attendance = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-            Attendance
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Track employee attendance and presence trends
-          </p>
+      <Reveal y={20}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+              Attendance
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Track employee attendance and presence trends
+            </p>
+          </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Quick links */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <Reveal stagger className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <button
           type="button"
           onClick={() => navigate("/attendance/today")}
@@ -262,10 +265,10 @@ const Attendance = () => {
             </div>
           </div>
         </button>
-      </div>
+      </Reveal>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <Reveal stagger className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
             <TrendingUp className="w-6 h-6" aria-hidden="true" />
@@ -331,9 +334,10 @@ const Attendance = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Trend */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -412,7 +416,8 @@ const Attendance = () => {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      </Reveal>
 
       {/* Departments breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -756,6 +761,7 @@ const Attendance = () => {
         </div>
       </div>
       {/* Attendance records */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -911,6 +917,7 @@ const Attendance = () => {
           </div>
         )}
       </div>
+      </Reveal>
     </div>
   );
 };

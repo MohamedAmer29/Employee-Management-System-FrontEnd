@@ -13,6 +13,7 @@ import { useManagerEmployeeAttendance } from "@/features/attendance/attendance.h
 import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const formatTime = (time: string) => {
   if (!time) return "";
@@ -74,6 +75,7 @@ const ManagerAttendanceEmployee = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Avatar
@@ -99,8 +101,10 @@ const ManagerAttendanceEmployee = () => {
           Back to Attendance
         </button>
       </div>
+      </Reveal>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5 shadow-sm flex items-center gap-4">
           <span className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/15 text-primary">
@@ -142,8 +146,10 @@ const ManagerAttendanceEmployee = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Records */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -229,6 +235,7 @@ const ManagerAttendanceEmployee = () => {
           </table>
         </div>
       </div>
+      </Reveal>
     </div>
   );
 };

@@ -22,6 +22,7 @@ import {
   DoughnutChartCard,
   type ChartItem,
 } from "@/components/dashboard/charts";
+import Reveal from "@/components/common/Reveal";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 
 const MONTH_LABELS = [
@@ -112,26 +113,28 @@ const MonthlyAttendance = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <button
-              type="button"
-              onClick={() => navigate("/attendance")}
-              className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary transition-colors cursor-pointer mb-3"
-            >
-              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-              Attendance
-            </button>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
-              Monthly Attendance
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Per-employee attendance for a selected month
-            </p>
+      <Reveal y={20}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div>
+              <button
+                type="button"
+                onClick={() => navigate("/attendance")}
+                className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary transition-colors cursor-pointer mb-3"
+              >
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                Attendance
+              </button>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
+                Monthly Attendance
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Per-employee attendance for a selected month
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
@@ -243,7 +246,8 @@ const MonthlyAttendance = () => {
         </div>
       ) : data ? (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Reveal>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <DoughnutChartCard title="Monthly Breakdown" items={summaryItems} />
             <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 p-5">
@@ -314,7 +318,9 @@ const MonthlyAttendance = () => {
               </div>
             </div>
           </div>
+          </Reveal>
 
+          <Reveal>
           <div className="rounded-2xl bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
@@ -379,6 +385,7 @@ const MonthlyAttendance = () => {
               </div>
             )}
           </div>
+          </Reveal>
         </>
       ) : (
         <div className="py-16 text-center">

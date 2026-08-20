@@ -18,6 +18,7 @@ import { useManagerPayrollEmployee } from "@/features/payroll/payroll.hooks";
 import type { PayrollStatus } from "@/api/user.api";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 const monthNames = [
   "", "January", "February", "March", "April", "May", "June",
@@ -131,6 +132,7 @@ const ManagerPayrollEmployee = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center gap-4">
         <button
           type="button"
@@ -151,8 +153,10 @@ const ManagerPayrollEmployee = () => {
           )}
         </div>
       </div>
+      </Reveal>
 
       {/* Stats */}
+      <Reveal>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -220,8 +224,10 @@ const ManagerPayrollEmployee = () => {
             </>
         }
       </div>
+      </Reveal>
 
       {/* Filters */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -265,6 +271,7 @@ const ManagerPayrollEmployee = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Table */}
       {isLoading ? (

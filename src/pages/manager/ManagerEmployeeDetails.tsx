@@ -35,6 +35,7 @@ import {
   useUpdateManagerEmployeeStatus,
 } from "@/features/employees/employees.hooks";
 import { formatDateInUserZone } from "@/utils/formatDate";
+import Reveal from "@/components/common/Reveal";
 
 interface InfoItemProps {
   icon: LucideIcon;
@@ -130,6 +131,7 @@ const ManagerEmployeeDetails = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex items-center justify-between gap-4">
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl blur-3xl opacity-50" />
@@ -185,8 +187,10 @@ const ManagerEmployeeDetails = () => {
           </button>
         </div>
       </div>
+      </Reveal>
 
       {/* Identity card */}
+      <Reveal>
       <section className="rounded-3xl bg-gradient-to-br from-white via-white to-gray-50 dark:from-dark-surface dark:via-dark-surface dark:to-white/5 border border-gray-200 dark:border-gray-800 p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div className="flex flex-col items-center text-center gap-5">
           <div className="relative">
@@ -257,6 +261,7 @@ const ManagerEmployeeDetails = () => {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Employee information */}
       <section aria-label="Employee information" className="relative">

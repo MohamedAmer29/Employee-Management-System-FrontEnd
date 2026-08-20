@@ -26,6 +26,7 @@ import {
 import { formatDateInUserZone } from "@/utils/formatDate";
 import Avatar from "@/components/common/Avatar";
 import { getAssetUrl } from "@/utils/assetUrl";
+import Reveal from "@/components/common/Reveal";
 
 const statusOptions: { value: string; label: string }[] = [
   { value: "", label: "All statuses" },
@@ -167,6 +168,7 @@ const ManagerPayroll = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
+      <Reveal y={20}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -177,8 +179,10 @@ const ManagerPayroll = () => {
           </p>
         </div>
       </div>
+      </Reveal>
 
       {/* Stats from API */}
+      <Reveal>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {isSummaryLoading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -250,6 +254,7 @@ const ManagerPayroll = () => {
               </>
             )}
       </div>
+      </Reveal>
 
       {/* Summary breakdown row */}
       {!isSummaryLoading && summary && (
@@ -299,6 +304,7 @@ const ManagerPayroll = () => {
       )}
 
       {/* Filters */}
+      <Reveal>
       <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -376,6 +382,7 @@ const ManagerPayroll = () => {
           </div>
         </div>
       </div>
+      </Reveal>
 
       {/* Table */}
       {isLoading ? (
